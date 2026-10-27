@@ -41,6 +41,7 @@ from src.baselines import (  # noqa: E402
     pca_transform,
 )
 from src.evaluate import evaluate  # noqa: E402
+from src.results_store import save_run  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -228,17 +229,18 @@ def main():
             display = msg if len(msg) <= 120 else msg[:117] + "…"
             print(f"   [{cat}] {display}")
 
-    # ---- Save CSV ----
+    # ---- Persist to structured store (runs.json + CSV + summary CSV) ----
+    run_id = save_run(
+        dataset=dataset_name,
+        n_seeds=n_seeds,
+        ks=ks,
+        rows=rows,
+    )
+
     df = pd.DataFrame(rows)
-    col_order = [
-        "dataset", "method", "seed", "k",
-        "acc", "n_feat", "fit_s", "infer_s", "search_s", "idx",
-    ]
-    df = df[col_order]
-    os.makedirs("results", exist_ok=True)
     csv_path = os.path.join("results", f"baselines_{dataset_name}.csv")
-    df.to_csv(csv_path, index=False)
     print(f"\nResults saved → {csv_path}  ({len(df)} rows)")
+    print(f"Run ID        → {run_id}  (see results/runs.json)")
 
     # ---- Print summary table ----
     print("\n" + "=" * 60)

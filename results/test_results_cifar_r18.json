@@ -1,0 +1,95 @@
+{
+  "run_id": "20261027_104618_cifar_r18",
+  "dataset": "cifar_r18",
+  "exit_code": 0,
+  "passed": 14,
+  "failed": 0,
+  "errors": 0,
+  "duration_s": 0.937,
+  "tests": [
+    {
+      "nodeid": "tests/test_leakage.py::test_scaler_fitted_on_train_only[digits]",
+      "outcome": "passed",
+      "duration_s": 0.0381,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_scaler_fitted_on_train_only[cifar_r18]",
+      "outcome": "passed",
+      "duration_s": 0.21966,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_indices_disjoint[digits]",
+      "outcome": "passed",
+      "duration_s": 0.03026,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_indices_disjoint[cifar_r18]",
+      "outcome": "passed",
+      "duration_s": 0.37549,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_stratified_split[digits]",
+      "outcome": "passed",
+      "duration_s": 0.012876,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_stratified_split[cifar_r18]",
+      "outcome": "passed",
+      "duration_s": 0.063184,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[f_classif]",
+      "outcome": "passed",
+      "duration_s": 0.000211,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[mutual_info_classif]",
+      "outcome": "passed",
+      "duration_s": 0.000177,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[pca_transform]",
+      "outcome": "passed",
+      "duration_s": 0.000169,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[select_all]",
+      "outcome": "passed",
+      "duration_s": 0.000234,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[select_kbest_anova]",
+      "outcome": "passed",
+      "duration_s": 0.00016,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[select_kbest_mi]",
+      "outcome": "passed",
+      "duration_s": 0.000157,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[select_model_lasso]",
+      "outcome": "passed",
+      "duration_s": 0.000162,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_leakage.py::test_selector_has_no_test_args[select_random]",
+      "outcome": "passed",
+      "duration_s": 0.000186,
+      "longrepr": null
+    }
+  ]
+}
