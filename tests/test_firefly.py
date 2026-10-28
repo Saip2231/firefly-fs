@@ -2,11 +2,13 @@
 
 Test inventory
 --------------
-(a) planted_features
-    Uses make_classification with 5 informative features placed at the
-    first 5 columns (shuffle=False). Firefly with budget=600 and k=5
-    averaged across 5 seeds must recover at least 3.0 of them on average
-    and stay within budget.
+(a) planted_features  [noisy, clean]
+    make_classification with 5 informative columns at 0..4 (shuffle=False),
+    on a noisy (class_sep=1, 2 clusters/class) and a clean (class_sep=2,
+    1 cluster/class) dataset.  Firefly (budget=600, k=5), 5-seed mean recall
+    of the SEPARATING informative columns must be >= 0.5 (clean: capped at
+    2 columns); budget respected.  Threshold reasons are documented beside
+    PLANTED_CONFIGS.
 
 (b) beats_random
     Averaged over 5 seeds, Firefly should achieve lower mean fitness
@@ -42,14 +44,21 @@ from src.firefly import binary_firefly, make_fitness, repair
 # Shared helpers
 # ---------------------------------------------------------------------------
 
-def _synthetic(n=1000, d=50, n_informative=5, seed=0):
-    """Return (Xtr, ytr) from a controlled synthetic dataset."""
+def _synthetic(n=1000, d=50, n_informative=5, seed=0,
+               class_sep=1.0, n_clusters_per_class=2):
+    """Return (Xtr, ytr) from a controlled synthetic dataset.
+
+    class_sep / n_clusters_per_class default to sklearn's defaults, so every
+    existing call is unchanged.
+    """
     X, y = make_classification(
         n_samples=n,
         n_features=d,
         n_informative=n_informative,
         n_redundant=0,
         n_repeated=0,
+        n_clusters_per_class=n_clusters_per_class,
+        class_sep=class_sep,
         shuffle=False,        # informative features stay at columns 0..n_inf-1
         random_state=seed,
     )
@@ -60,34 +69,70 @@ def _synthetic(n=1000, d=50, n_informative=5, seed=0):
 # (a) Planted features
 # ---------------------------------------------------------------------------
 
-def test_planted_features():
-    """Firefly recovers planted informative columns averaged over 5 seeds (mean >= 3.0 / 5)."""
-    k = 5
-    budget = 600
-    informative_cols = np.arange(5)
-    hits = []
+# Ground truth: only informative columns whose class means differ carry
+# linear signal (see src/synthetic.py), so recall is measured on the
+# SEPARATING columns, not on all n_informative columns.
+#
+# THRESHOLD = 0.5 (both datasets).  Reason, fixed from chance level and not
+# from any observed run: a random k-subset has expected recall k/d = 5/50 =
+# 0.10, and a 5-seed mean of 0.5 under random choice is vanishingly unlikely,
+# so 0.5 separates "found signal" from chance with a wide margin while staying
+# well below the maximum the fitness can reward (1.0).
+#
+# CAP (clean only) = 2.  Reason: with class_sep=2 each separating column puts
+# the class means 4 units apart, so two such columns already drive the Bayes
+# error to ~0; on 250 validation rows (1 row = 0.4 pts) the fitness cannot
+# reward a third, so recall beyond 2 columns would test the data, not the
+# search.  Noisy data (class_sep=1) does not saturate, so it is uncapped.
+PLANTED_CONFIGS = {
+    "noisy": dict(class_sep=1.0, n_clusters_per_class=2, cap=None),
+    "clean": dict(class_sep=2.0, n_clusters_per_class=1, cap=2),
+}
+PLANTED_MIN_RECALL = 0.5
+
+
+@pytest.mark.parametrize("name", list(PLANTED_CONFIGS))
+def test_planted_features(name):
+    """Firefly recovers planted SEPARATING columns: 5-seed mean recall >= 0.5."""
+    from src.synthetic import separating_columns
+
+    cfg = PLANTED_CONFIGS[name]
+    d, k, budget = 50, 5, 600
+    recalls = []
 
     for s in range(5):
-        Xtr, ytr = _synthetic(n=1000, d=50, n_informative=5, seed=s)
-        fitness, state = make_fitness(Xtr, ytr, k=k, seed=s)
-        best_mask, best_fit, history = binary_firefly(
-            fitness, state, d=50, k=k,
-            budget=budget, n_fireflies=20,
-            seed=s,
+        Xtr, ytr = _synthetic(n=1000, d=d, n_informative=5, seed=s,
+                              class_sep=cfg["class_sep"],
+                              n_clusters_per_class=cfg["n_clusters_per_class"])
+        sep = separating_columns(Xtr, ytr, 5, cfg["class_sep"],
+                                 cfg["n_clusters_per_class"])
+        # A doubtful ground-truth label must fail loudly, not miscount silently
+        assert sep["ambiguous"].size == 0, (
+            f"{name} seed {s}: ambiguous separating label(s) {sep['ambiguous']}, "
+            f"gaps {np.round(sep['gaps'], 3)}"
         )
+        n_sep = len(sep["sep_idx"])
+        assert n_sep > 0, f"{name} seed {s}: no separating column"
 
-        overlap = int(best_mask[informative_cols].sum())
-        hits.append(overlap)
-
+        fitness, state = make_fitness(Xtr, ytr, k=k, seed=s)
+        best_mask, _, _ = binary_firefly(
+            fitness, state, d=d, k=k, budget=budget, n_fireflies=20, seed=s,
+        )
         # Budget respected on every seed
         assert state["evals"] <= budget, (
-            f"Seed {s}: Used {state['evals']} evals, budget was {budget}"
+            f"{name} seed {s}: used {state['evals']} evals, budget was {budget}"
         )
 
-    mean_hits = float(np.mean(hits))
-    assert mean_hits >= 3.0, (
-        f"Only {mean_hits:.2f}/5 planted features recovered on average across 5 seeds: {hits}. "
-        f"Expected >= 3.0 (random search averages ~0.5)."
+        sep_hits = int(best_mask[sep["sep_idx"]].sum())
+        if cfg["cap"] is not None:
+            recalls.append(min(sep_hits, cfg["cap"]) / min(n_sep, cfg["cap"]))
+        else:
+            recalls.append(sep_hits / n_sep)
+
+    mean_recall = float(np.mean(recalls))
+    assert mean_recall >= PLANTED_MIN_RECALL, (
+        f"{name}: mean separating-column recall {mean_recall:.2f} over 5 seeds "
+        f"{np.round(recalls, 2).tolist()} < {PLANTED_MIN_RECALL} (chance = {k / d:.2f})"
     )
 
 
@@ -314,3 +359,87 @@ def test_repair_exact_noop():
     assert fixed.sum() == 5
     np.testing.assert_array_equal(fixed, mask)
     assert not np.shares_memory(fixed, mask)
+
+
+# ---------------------------------------------------------------------------
+# (f) trace=None leaves algorithm byte-for-byte unchanged
+# ---------------------------------------------------------------------------
+
+def test_trace_none_unchanged():
+    """binary_firefly with trace=None and trace={} must produce identical
+    best_mask, best_fit, and history (same seed => same RNG path).
+
+    This verifies that the tracing instrumentation has zero effect on
+    algorithm behaviour: no extra RNG draws, no branching in the hot path.
+    """
+    Xtr, ytr = _synthetic(n=600, d=40, seed=17)
+    k = 6
+
+    # Run 1: no trace (baseline)
+    fitness1, state1 = make_fitness(Xtr, ytr, k=k, seed=17)
+    mask1, fit1, hist1 = binary_firefly(
+        fitness1, state1, d=40, k=k,
+        budget=300, n_fireflies=10,
+        seed=17,
+        trace=None,      # explicit None
+    )
+
+    # Run 2: with trace dict
+    trace2: dict = {}
+    fitness2, state2 = make_fitness(Xtr, ytr, k=k, seed=17)
+    mask2, fit2, hist2 = binary_firefly(
+        fitness2, state2, d=40, k=k,
+        budget=300, n_fireflies=10,
+        seed=17,
+        trace=trace2,
+    )
+
+    np.testing.assert_array_equal(
+        mask1, mask2,
+        err_msg="trace=None vs trace={} produced different best_mask",
+    )
+    assert fit1 == fit2, (
+        f"trace=None fit {fit1:.8f} != trace={{}} fit {fit2:.8f}"
+    )
+    assert hist1 == hist2, "trace=None vs trace={} produced different history"
+    assert state1["evals"] == state2["evals"], (
+        f"evals differ: {state1['evals']} vs {state2['evals']}"
+    )
+
+    # Trace must have been populated
+    assert "sweeps" in trace2 and len(trace2["sweeps"]) > 0, (
+        "trace dict was not populated with sweep records"
+    )
+    # Spot-check trace record structure
+    for rec in trace2["sweeps"]:
+        for key in ("best_fitness", "proposals", "cache_hits",
+                    "accepted_moves", "new_evals", "diversity",
+                    "brightest_changed"):
+            assert key in rec, f"trace sweep record missing key {key!r}"
+
+
+def test_trace_accounting_consistent():
+    """Trace counters must agree with state/history (exact bookkeeping,
+    so these are equalities, not tuned thresholds)."""
+    Xtr, ytr = _synthetic(n=600, d=40, seed=19)
+    k = 5
+    trace: dict = {}
+    fitness, state = make_fitness(Xtr, ytr, k=k, seed=19)
+    _, best_fit, history = binary_firefly(
+        fitness, state, d=40, k=k, budget=250, n_fireflies=10,
+        seed=19, trace=trace,
+    )
+    sweeps = trace["sweeps"]
+
+    # One record per sweep, best_fitness mirrors history exactly
+    assert [s["best_fitness"] for s in sweeps] == history
+    # Every new eval is attributed either to init or to exactly one sweep
+    assert trace["init_evals"] + sum(s["new_evals"] for s in sweeps) == state["evals"]
+    # Init best is before any move, so it can only be >= the final best
+    assert trace["init_best"] >= best_fit
+    # Per-sweep counters are internally consistent
+    for s in sweeps:
+        assert 0 <= s["cache_hits"] <= s["proposals"]
+        assert 0 <= s["accepted_moves"] <= s["proposals"]
+        assert s["new_evals"] <= s["proposals"]
+

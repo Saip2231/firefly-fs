@@ -197,6 +197,48 @@ def save_run(
     return run_id
 
 
+def log_experiment(
+    *,
+    name: str,
+    params: dict,
+    seeds: list[int],
+    csv_paths: list[str],
+    extra: dict | None = None,
+) -> str:
+    """Append a lightweight record for a diagnostic/ablation experiment.
+
+    Unlike :func:`save_run` this writes NO csv files (the experiment saves
+    its own raw per-seed rows); it only appends run_id, timestamp,
+    parameters, seeds and the csv locations to ``runs.json``.
+    """
+    import sklearn  # noqa: PLC0415
+
+    _ensure_results_dir()
+    run_id = _make_run_id(name)
+    record: dict[str, Any] = {
+        "run_id":     run_id,
+        "timestamp":  _local_iso(),
+        "dataset":    name,          # best_per_method() indexes r["dataset"]
+        "kind":       "experiment",
+        "n_seeds":    len(seeds),
+        "seeds":      list(seeds),
+        "ks":         sorted(set(params.get("ks", []))),
+        "params":     params,
+        "csv_paths":  list(csv_paths),
+        "python":     sys.version.split()[0],
+        "platform":   platform.platform(terse=True),
+        "numpy":      np.__version__,
+        "sklearn":    sklearn.__version__,
+    }
+    if extra:
+        record["extra"] = extra
+    runs = _load_runs()
+    runs.append(record)
+    _save_runs(runs)
+    print(f"[results_store] Experiment '{run_id}' logged to results/runs.json")
+    return run_id
+
+
 # ---------------------------------------------------------------------------
 # Query helpers
 # ---------------------------------------------------------------------------

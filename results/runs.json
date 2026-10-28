@@ -8210,5 +8210,411 @@
         "search_s_std": 0.01268267175532388
       }
     ]
+  },
+  {
+    "run_id": "20261028_225402_diagnose_d500",
+    "timestamp": "2026-10-28T22:54:02.875212+05:30",
+    "dataset": "diagnose_d500",
+    "kind": "experiment",
+    "n_seeds": 5,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "ks": [
+      5,
+      10
+    ],
+    "params": {
+      "configs": [
+        {
+          "d": 500,
+          "n_informative": 5,
+          "k": 5,
+          "budget": 600,
+          "n": 1000
+        },
+        {
+          "d": 500,
+          "n_informative": 10,
+          "k": 10,
+          "budget": 800,
+          "n": 2000
+        }
+      ],
+      "n_fireflies": 20,
+      "methods": [
+        "firefly",
+        "firefly_levy",
+        "random_search"
+      ],
+      "data_random_state": "seed",
+      "fitness_seed": "seed",
+      "ks": [
+        5,
+        10
+      ]
+    },
+    "csv_paths": [
+      "results\\diagnostics_d500.csv",
+      "results\\diagnostics_d500_sweeps.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "extra": {
+      "runtime_s": 157.6
+    }
+  },
+  {
+    "run_id": "20261028_231601_validate_clean_signal",
+    "timestamp": "2026-10-28T23:16:01.398213+05:30",
+    "dataset": "validate_clean_signal",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "ds": [
+        50,
+        500
+      ],
+      "n_search": [
+        1000,
+        2000
+      ],
+      "n_informative": 5,
+      "ks": [
+        5
+      ],
+      "budget": 600,
+      "n_fireflies": 20,
+      "n_total": 8000,
+      "n_holdout": 5000,
+      "class_sep": 2.0,
+      "n_clusters_per_class": 1,
+      "methods": [
+        "firefly",
+        "firefly_levy",
+        "random_search"
+      ],
+      "data_random_state": "seed",
+      "holdout_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "csv_paths": [
+      "results\\validate_clean_signal.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "extra": {
+      "runtime_s": 492.0
+    }
+  },
+  {
+    "run_id": "20261028_233107_check_d500_seed1",
+    "timestamp": "2026-10-28T23:31:07.075282+05:30",
+    "dataset": "check_d500_seed1",
+    "kind": "experiment",
+    "n_seeds": 30,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "d": 500,
+      "n_search": 1000,
+      "data_seed": 1,
+      "fitness_seed": 1,
+      "ks": [
+        5
+      ],
+      "budget": 600,
+      "n_fireflies": 20,
+      "class_sep": 2.0
+    },
+    "csv_paths": [
+      "results\\check_d500_seed1_sweeps.csv",
+      "results\\check_d500_seed1_freq.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "extra": {
+      "runtime_s": 224.3
+    }
+  },
+  {
+    "run_id": "20261028_233923_rescore_clean_signal",
+    "timestamp": "2026-10-28T23:39:23.305834+05:30",
+    "dataset": "rescore_clean_signal",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "source": "results/validate_clean_signal.csv",
+      "class_sep": 2.0,
+      "n_clusters_per_class": 1,
+      "n_informative": 5,
+      "threshold": 2.0,
+      "gap_rows": "non-holdout (3000)",
+      "ks": [
+        5
+      ]
+    },
+    "csv_paths": [
+      "results\\separating_columns_clean_signal.csv",
+      "results\\validate_clean_signal_rescored.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "extra": {
+      "runtime_s": 8.3
+    }
+  },
+  {
+    "run_id": "20261028_235229_rerank_ablation",
+    "timestamp": "2026-10-28T23:52:29.324323+05:30",
+    "dataset": "rerank_ablation",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "ds": [
+        50,
+        500
+      ],
+      "n_informative": 5,
+      "ks": [
+        5
+      ],
+      "budget": 800,
+      "n_fireflies": 20,
+      "n_total": 6000,
+      "n_search": 1000,
+      "n_holdout": 5000,
+      "max_rows": 1000,
+      "rerank_top_m": 10,
+      "n_splits": 5,
+      "class_sep": 1.0,
+      "n_clusters_per_class": 2,
+      "data_random_state": "seed"
+    },
+    "csv_paths": [
+      "results\\rerank_ablation.csv",
+      "results\\separating_columns_rerank_ablation.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "extra": {
+      "runtime_s": 120.2
+    }
+  },
+  {
+    "run_id": "20261029_000149_time_fitness",
+    "timestamp": "2026-10-29T00:01:49.831380+05:30",
+    "dataset": "time_fitness",
+    "kind": "experiment",
+    "n_seeds": 1,
+    "seeds": [
+      0
+    ],
+    "ks": [
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "params": {
+      "datasets": {
+        "cifar_r18": [
+          16,
+          32,
+          64,
+          128
+        ],
+        "digits": [
+          8,
+          16,
+          32
+        ]
+      },
+      "n_masks": 30,
+      "max_rows": 2000,
+      "budget": 800,
+      "n_seeds_planned": 10,
+      "n_methods": 3,
+      "rerank_top_m": 10,
+      "n_splits": 5,
+      "threads": 1,
+      "cpu_count": 16,
+      "workers": 15,
+      "ks": [
+        8,
+        16,
+        32,
+        64,
+        128
+      ]
+    },
+    "csv_paths": [
+      "results\\time_fitness.csv",
+      "results\\time_fitness.md"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "extra": {
+      "runtime_s": 55.8,
+      "per_k": [
+        {
+          "dataset": "cifar_r18",
+          "k": 16,
+          "mean_s": 0.028485880000516772,
+          "median_s": 0.028391650004778057,
+          "p95_s": 0.036338944986346176,
+          "rerank_s": 4.445960799988825,
+          "per_run_s": 27.24685530041461
+        },
+        {
+          "dataset": "cifar_r18",
+          "k": 32,
+          "mean_s": 0.03956164666645539,
+          "median_s": 0.038170700005139224,
+          "p95_s": 0.04870360499771777,
+          "rerank_s": 5.798367900017183,
+          "per_run_s": 37.46020093319627
+        },
+        {
+          "dataset": "cifar_r18",
+          "k": 64,
+          "mean_s": 0.06708255333263272,
+          "median_s": 0.06687875000352506,
+          "p95_s": 0.07598716000211425,
+          "rerank_s": 9.656452199997148,
+          "per_run_s": 63.333613666104306
+        },
+        {
+          "dataset": "cifar_r18",
+          "k": 128,
+          "mean_s": 0.10382404999885088,
+          "median_s": 0.10081634999369271,
+          "p95_s": 0.12615104501601307,
+          "rerank_s": 19.194960199994966,
+          "per_run_s": 102.26916969909023
+        },
+        {
+          "dataset": "digits",
+          "k": 8,
+          "mean_s": 0.03224437666649464,
+          "median_s": 0.03214229999866802,
+          "p95_s": 0.03976467499014688,
+          "rerank_s": 1.6508330999931786,
+          "per_run_s": 27.450555133196755
+        },
+        {
+          "dataset": "digits",
+          "k": 16,
+          "mean_s": 0.037254949997683674,
+          "median_s": 0.036291850003181025,
+          "p95_s": 0.04482927998324157,
+          "rerank_s": 1.8394195000000764,
+          "per_run_s": 31.645867098142237
+        },
+        {
+          "dataset": "digits",
+          "k": 32,
+          "mean_s": 0.03934993666480295,
+          "median_s": 0.03823394999199081,
+          "p95_s": 0.046830845004296864,
+          "rerank_s": 1.9018295999849215,
+          "per_run_s": 33.38485913182376
+        }
+      ]
+    }
   }
 ]
