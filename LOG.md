@@ -146,4 +146,7 @@
 - Correction to the Stage-4 note and to results/tuning_decision.md (not edited, it is a committed result): plain populations share Firefly's 10 members, but seeded populations share only their first 5 (the number of score-biased members scales with n). Test added in tests/test_registry.py; PREREG.md states it.
 - New: config/frozen_config.yaml (values from results/tuning_decision.md; test checks they match), PREREG.md (user draft + raw mask as primary, frozen hp, exact k lists and 12 families, tie/NaN rule, disclosed asymmetries incl. review MAJOR 3), experiments/plan_compute.py. experiments/_common.holm gains nan_policy="as_one" (default "exclude" unchanged, so Day-3 outputs are unchanged).
 - Order: commit frozen config -> fill its hash into PREREG.md -> commit PREREG -> tag day5-launch.
+- Tests: pytest tests/ -q -> 127 passed (258.9 s).
+- `python experiments/plan_compute.py` (run 20261029_231932_plan_compute, results/compute_plan.md): 16 CPUs, 15 workers; contention factor cifar_r18 1.23, digits 1.00; 480 runs; 20.15 h on 1 worker, 1.34 h on 15 workers (ideal packing, 20 % margin). Per dataset x budget (15 workers): digits 800 0.06 h, digits 3000 0.21 h, cifar_r18 800 0.25 h, cifar_r18 3000 0.83 h; longest single run ~488 s (cifar_r18 k=128, budget 3000). Optional firefly_levy +0.08 h. No reduction needed.
+- Frozen config committed: 7b985ca49205f025700593e9eba38a5268156b16 ("day4: frozen config"); hash filled into PREREG.md.
 
