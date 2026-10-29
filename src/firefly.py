@@ -89,10 +89,12 @@ import warnings
 
 import numpy as np
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.feature_selection import f_classif
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
 
 from src.classifiers import SEARCH_CLF_PARAMS
+from src.init_pop import check_init_masks
 
 # Shared "already shown" registry for re-emitted fit warnings, so the
 # "default" filter action shows each one once, as a direct warn() would.
@@ -138,6 +140,9 @@ def make_fitness(
         {"n_conv_warn": int} -- new fits that raised a ConvergenceWarning
                            (fitness values are unaffected; warnings are
                            re-emitted so warn_once still reports them).
+        {"filter_scores": ndarray (d,)} -- ANOVA F (f_classif, nan_to_num)
+                           on the INNER-TRAIN rows only; for
+                           src.init_pop.init_population(kind="seeded").
     """
     n, d = Xtr.shape
 
@@ -162,10 +167,17 @@ def make_fitness(
     X_in_val = X_sub[inner_val_idx]
     y_in_val = y_sub[inner_val_idx]
 
+    # -- Filter scores for seeded initialisation (inner-train rows ONLY) ----
+    # ANOVA F on the rows the classifier is trained on, never on inner-val
+    # rows, so validation stays unbiased.  Not a classifier fit: it does not
+    # touch state["evals"] or any fitness value.  NaN (constant column) -> 0.
+    filter_scores = np.nan_to_num(f_classif(X_in_tr, y_in_tr)[0])
+
     _cache: dict[bytes, float] = {}
     # state["cache"] is the SAME dict object as _cache (read-only use by
     # rerank); exposing it does not change any fitness value or count.
-    state: dict = {"evals": 0, "cache": _cache, "n_conv_warn": 0}
+    state: dict = {"evals": 0, "cache": _cache, "n_conv_warn": 0,
+                   "filter_scores": filter_scores}
 
     def fitness(mask: np.ndarray) -> float:
         """Evaluate a boolean feature mask.
@@ -270,6 +282,7 @@ def binary_firefly(
     levy: bool       = False,
     seed: int        = 0,
     trace: dict | None = None,
+    init_masks: np.ndarray | None = None,
 ) -> tuple[np.ndarray, float, list[float]]:
     """Binary Firefly Algorithm for feature-mask optimisation (v2).
 
@@ -317,6 +330,14 @@ def binary_firefly(
                              counted in proposals / cache_hits / accepted_moves)
         When ``trace=None`` (the default) behaviour is byte-for-byte unchanged.
 
+    init_masks : (n_fireflies, d) bool array or None
+        None (default): random initial swarm, byte-for-byte as before; it
+        equals init_population("random", n_fireflies, d, k,
+        np.random.default_rng(seed)).  Otherwise the swarm starts from a copy
+        of init_masks (ValueError unless every row has exactly k bits) and
+        no RNG draws are spent on initialisation, so the later move stream
+        differs from the None path even for the same masks.
+
     Tie-stall (F3, approved change)
     -------------------------------
     If a sweep makes no attraction proposal (no firefly strictly brighter than
@@ -342,10 +363,14 @@ def binary_firefly(
     rng = np.random.default_rng(seed)
 
     # -- Initialise swarm: n_fireflies random masks each with exactly k True -
-    positions = np.zeros((n_fireflies, d), dtype=bool)
-    for i in range(n_fireflies):
-        chosen = rng.choice(d, size=k, replace=False)
-        positions[i, chosen] = True
+    if init_masks is None:
+        positions = np.zeros((n_fireflies, d), dtype=bool)
+        for i in range(n_fireflies):
+            chosen = rng.choice(d, size=k, replace=False)
+            positions[i, chosen] = True
+    else:
+        # Caller-supplied (shared) population; copied, never mutated.
+        positions = check_init_masks(init_masks, n_fireflies, d, k)
 
     # Evaluate initial positions
     fits = np.full(n_fireflies, np.inf)
