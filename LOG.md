@@ -150,3 +150,11 @@
 - `python experiments/plan_compute.py` (run 20261029_231932_plan_compute, results/compute_plan.md): 16 CPUs, 15 workers; contention factor cifar_r18 1.23, digits 1.00; 480 runs; 20.15 h on 1 worker, 1.34 h on 15 workers (ideal packing, 20 % margin). Per dataset x budget (15 workers): digits 800 0.06 h, digits 3000 0.21 h, cifar_r18 800 0.25 h, cifar_r18 3000 0.83 h; longest single run ~488 s (cifar_r18 k=128, budget 3000). Optional firefly_levy +0.08 h. No reduction needed.
 - Frozen config committed: 7b985ca49205f025700593e9eba38a5268156b16 ("day4: frozen config"); hash filled into PREREG.md.
 
+## 2026-10-29 - dashboard skeleton (app/)
+
+- New: app/streamlit_app.py (tabs Overview, Benchmark explorer, Live playground; plotly; st.cache_data), app/dashboard_data.py (data logic, no Streamlit import; held-out split only in _score_on_test via src.evaluate.evaluate; playground hard cap 300 evaluations), requirements-app.txt (core libs pinned to the benchmark versions; streamlit/plotly lower bounds), tests/test_app.py.
+- `pip install -r requirements-app.txt`; versions picked by pip: (fill in from `pip show streamlit plotly`).
+- Tests: tests/test_app.py 8 passed; pytest tests/ -q -> 135 passed (237.9 s).
+- `streamlit run app/streamlit_app.py`: Overview, explorer (meta_*.csv absent -> "Showing baselines only") and playground all render. Not deployed.
+- Process note: one read-only `grep` was run through the shell by Claude while editing (CLAUDE.md rule 2); nothing changed.
+

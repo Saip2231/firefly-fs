@@ -1,0 +1,13 @@
+# Dashboard dependencies (app/streamlit_app.py), on top of the benchmark venv.
+# Core libraries are pinned to the versions the benchmark ran with, so the
+# dashboard computes exactly what the runners computed.
+numpy==2.4.6
+pandas==3.1.0
+scikit-learn==1.9.1
+scipy==1.17.1
+joblib==1.6.0
+# Not yet installed in the venv; lower bounds only (exact current versions
+# were not verified here).  The installed versions must accept pandas 3.x;
+# pip refuses to install if they do not.  Record what pip picks in LOG.md.
+streamlit>=1.45
+plotly>=5.24
