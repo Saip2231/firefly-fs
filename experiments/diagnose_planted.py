@@ -4,8 +4,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
 from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from src.classifiers import final_clf
 from src.firefly import make_fitness, binary_firefly
 
 D, NI, K, BUDGET = 50, 5, 5, 600
@@ -18,7 +18,7 @@ Xs, Xh, ys, yh = train_test_split(X, y, train_size=1000, stratify=y, random_stat
 true_mask = np.zeros(D, bool); true_mask[:NI] = True
 
 def holdout_acc(mask):
-    clf = LogisticRegression(max_iter=500).fit(Xs[:, mask], ys)
+    clf = final_clf().fit(Xs[:, mask], ys)
     return clf.score(Xh[:, mask], yh)
 
 for seed in range(5):

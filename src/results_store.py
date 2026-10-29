@@ -59,6 +59,8 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from src.classifiers import clf_configs
+
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
@@ -156,6 +158,7 @@ def save_run(
         "ks":        sorted(ks),
         "python":    sys.version.split()[0],
         "platform":  platform.platform(terse=True),
+        "classifiers": clf_configs(),
         "rows":      rows,
         "summary":   summary,
     }
@@ -229,6 +232,7 @@ def log_experiment(
         "platform":   platform.platform(terse=True),
         "numpy":      np.__version__,
         "sklearn":    sklearn.__version__,
+        "classifiers": clf_configs(),
     }
     if extra:
         record["extra"] = extra

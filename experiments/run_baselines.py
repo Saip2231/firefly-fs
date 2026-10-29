@@ -23,7 +23,6 @@ import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 
 # ---------------------------------------------------------------------------
@@ -40,6 +39,7 @@ from src.baselines import (  # noqa: E402
     select_model_lasso,
     pca_transform,
 )
+from src.classifiers import final_clf  # noqa: E402
 from src.evaluate import evaluate  # noqa: E402
 from src.results_store import save_run  # noqa: E402
 
@@ -105,7 +105,7 @@ def _run_one(dataset_name, seed, k, method_name, method_fn, needs_seed,
     with warnings.catch_warnings(record=True) as w_list:
         warnings.simplefilter("always")
 
-        clf = LogisticRegression(max_iter=500)
+        clf = final_clf()
 
         # ---- Feature selection / transform (timed) ----
         t0 = time.perf_counter()
