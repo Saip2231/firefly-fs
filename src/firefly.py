@@ -65,9 +65,19 @@ binary_firefly  (v2 — three targeted fixes)
 
 from __future__ import annotations
 
+import time
+import warnings
+
 import numpy as np
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
+
+from src.classifiers import SEARCH_CLF_PARAMS
+
+# Shared "already shown" registry for re-emitted fit warnings, so the
+# "default" filter action shows each one once, as a direct warn() would.
+_WARN_REGISTRY: dict = {}
 
 
 # ---------------------------------------------------------------------------
@@ -106,6 +116,9 @@ def make_fitness(
         {"evals": int}  -- count of NEW (uncached) classifier trainings.
         {"cache": dict} -- mask.tobytes() -> fitness for every valid mask
                            evaluated so far (len(cache) == evals).
+        {"n_conv_warn": int} -- new fits that raised a ConvergenceWarning
+                           (fitness values are unaffected; warnings are
+                           re-emitted so warn_once still reports them).
     """
     n, d = Xtr.shape
 
@@ -133,7 +146,7 @@ def make_fitness(
     _cache: dict[bytes, float] = {}
     # state["cache"] is the SAME dict object as _cache (read-only use by
     # rerank); exposing it does not change any fitness value or count.
-    state: dict = {"evals": 0, "cache": _cache}
+    state: dict = {"evals": 0, "cache": _cache, "n_conv_warn": 0}
 
     def fitness(mask: np.ndarray) -> float:
         """Evaluate a boolean feature mask.
@@ -161,8 +174,18 @@ def make_fitness(
             return _cache[key]
 
         # -- Train LogisticRegression on inner split --------------------------
-        clf = LogisticRegression(max_iter=100, random_state=seed)
-        clf.fit(X_in_tr[:, mask], y_in_tr)
+        # (= src.classifiers.search_clf(seed); built here so tests can
+        # monkeypatch src.firefly.LogisticRegression)
+        clf = LogisticRegression(**SEARCH_CLF_PARAMS, random_state=seed)
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            clf.fit(X_in_tr[:, mask], y_in_tr)
+        # NB: never name a variable `w` here; it is the sparsity weight.
+        if any(issubclass(wr.category, ConvergenceWarning) for wr in caught):
+            state["n_conv_warn"] += 1
+        for wr in caught:   # re-emit so normal warning handling still applies
+            warnings.warn_explicit(wr.message, wr.category, wr.filename, wr.lineno,
+                                   registry=_WARN_REGISTRY)
 
         val_acc   = clf.score(X_in_val[:, mask], y_in_val)
         val_error = 1.0 - val_acc
@@ -465,6 +488,19 @@ def rerank(
     Only training data is passed in; the search fitness is never called, so
     state["evals"] (the search budget) is unchanged.
 
+    Cost and data caveats (report these with any rerank result)
+    ----------------------------------------------------------
+    * Re-ranking is NOT free: it makes len(candidates) * n_splits extra
+      classifier fits (default 10 * 5 = 50), returned as rerank_fits and not
+      counted in the search budget.  Report total_fits = evals_used +
+      rerank_fits, and never compare a reranked mask against a method that
+      was not given the same rerank.
+    * It sees MORE data than the search: CV runs on ALL rows of Xtr, while
+      the search fitness sees at most max_rows of them.
+    * Its CV folds include the inner-validation rows whose labels selected
+      the candidates, so some selection bias remains.  This is training data
+      only (no test leakage), but the CV accuracy of the winner is optimistic.
+
     Returns
     -------
     best_mask   : np.ndarray of bool
@@ -487,7 +523,7 @@ def rerank(
         Xm = Xtr[:, mask]
         accs = []
         for tr, va in folds:
-            clf = LogisticRegression(max_iter=100, random_state=seed)
+            clf = LogisticRegression(**SEARCH_CLF_PARAMS, random_state=seed)
             clf.fit(Xm[tr], ytr[tr])
             accs.append(clf.score(Xm[va], ytr[va]))
         scores.append({"mask": mask, "cached_fitness": float(fit),
@@ -516,21 +552,30 @@ def run_firefly(
     the raw best as the re-ranked mask (rerank_fits=0).
 
     Returns dict with raw_mask, raw_fit, history, reranked_mask,
-    rerank_scores, search_evals, rerank_fits.
+    rerank_scores, evals_used (= search_evals, kept as an alias),
+    rerank_fits, total_fits = evals_used + rerank_fits, search_s, rerank_s.
     """
     d = Xtr.shape[1]
+    t0 = time.perf_counter()
     fitness, state = make_fitness(Xtr, ytr, k=k, seed=seed, max_rows=max_rows)
     raw_mask, raw_fit, history = binary_firefly(
         fitness, state, d=d, k=k, budget=budget, seed=seed, **ff_kwargs)
     search_evals = state["evals"]
+    search_s = time.perf_counter() - t0
 
+    t0 = time.perf_counter()
     if rerank_top_m > 0:
         rr_mask, scores, rr_fits = rerank(state, Xtr, ytr, k, top_m=rerank_top_m,
                                           n_splits=n_splits, seed=seed)
     else:
         rr_mask, scores, rr_fits = raw_mask.copy(), [], 0
+    rerank_s = time.perf_counter() - t0
 
     return {
+        "evals_used":    search_evals,
+        "total_fits":    search_evals + rr_fits,
+        "search_s":      search_s,
+        "rerank_s":      rerank_s,
         "raw_mask":      raw_mask,
         "raw_fit":       raw_fit,
         "history":       history,

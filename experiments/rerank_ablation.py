@@ -13,6 +13,13 @@ Hits are reported two ways:
   sep_hits  - selected columns among the SEPARATING informative ones
               (src.synthetic.separating_columns, threshold = 1.0/2 = 0.5,
               gaps measured on the search rows only)
+Comparison rule (Day-3 review, F2):
+  Primary method comparisons elsewhere use RAW masks only (equal search
+  budget).  This script is the rerank ABLATION: it compares Firefly-reranked
+  with Firefly-raw from the SAME search, never a reranked mask with another
+  method's non-reranked mask.  Each row reports evals_used (search budget
+  spent), rerank_fits (extra fits, 0 for raw), total_fits = evals_used +
+  rerank_fits, search_s and rerank_s (0 for raw).
 Output: results/rerank_ablation.csv, entry in results/runs.json.
 """
 
@@ -23,11 +30,11 @@ import time
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
 from _common import RESULTS_DIR, paired_wilcoxon, warn_once
 
+from src.classifiers import final_clf
 from src.firefly import run_firefly
 from src.results_store import log_experiment
 from src.synthetic import separating_columns
@@ -41,7 +48,8 @@ CLASS_SEP, N_CLUSTERS = 1.0, 2          # sklearn defaults
 
 
 def holdout_acc(mask, Xs, ys, Xh, yh, seed):
-    clf = LogisticRegression(max_iter=100, random_state=seed)  # as make_fitness
+    # seed kept in the signature for callers; final_clf() has fixed settings
+    clf = final_clf()
     clf.fit(Xs[:, mask], ys)
     return float(clf.score(Xh[:, mask], yh))
 
@@ -75,6 +83,7 @@ def main():
             cand_keys = [sc["mask"].tobytes() for sc in r["rerank_scores"]]
             changed = bool(not np.array_equal(r["raw_mask"], r["reranked_mask"]))
             for variant, mask in (("raw", r["raw_mask"]), ("reranked", r["reranked_mask"])):
+                rr_fits = r["rerank_fits"] if variant == "reranked" else 0
                 key = mask.tobytes()
                 # 0 = lowest cached fitness; -1 = not among the top_m candidates
                 # (possible for raw when more than top_m masks tie at its fitness)
@@ -91,7 +100,10 @@ def main():
                     candidate_rank=pos,
                     holdout_acc=holdout_acc(mask, Xs, ys, Xh, yh, seed),
                     changed=changed,
-                    search_evals=r["search_evals"], rerank_fits=r["rerank_fits"],
+                    evals_used=r["evals_used"], rerank_fits=rr_fits,
+                    total_fits=r["evals_used"] + rr_fits,
+                    search_s=r["search_s"],
+                    rerank_s=r["rerank_s"] if variant == "reranked" else 0.0,
                     seconds=secs, idx=",".join(map(str, sorted(chosen))),
                 ))
 
@@ -112,12 +124,14 @@ def main():
 
     print("\nPER-SEED ROWS")
     print(df[["d", "seed", "variant", "hits", "sep_hits", "n_sep", "val_fitness", "cv_acc",
-              "candidate_rank", "holdout_acc", "changed", "search_evals", "rerank_fits"]]
+              "candidate_rank", "holdout_acc", "changed", "evals_used", "rerank_fits",
+              "total_fits", "rerank_s"]]
           .to_string(index=False, float_format=fmt))
 
     print("\nMEAN +/- STD per (d, variant)   [n=10 seeds]")
     summ = (df.groupby(["d", "variant"])[["hits", "sep_hits", "holdout_acc", "val_fitness",
-                                         "search_evals", "rerank_fits"]]
+                                         "evals_used", "rerank_fits", "total_fits",
+                                         "search_s", "rerank_s"]]
               .agg(["mean", "std"]).reset_index())
     summ.columns = ["_".join(c).strip("_") for c in summ.columns]
     print(summ.to_string(index=False, float_format=fmt))

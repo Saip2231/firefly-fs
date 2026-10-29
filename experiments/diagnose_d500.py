@@ -71,6 +71,8 @@ def run_firefly(X, y, cfg, seed, levy, name):
     row = dict(
         method=name,
         evals_used=state["evals"],
+        rerank_fits=0,                  # no rerank in this diagnostic
+        total_fits=state["evals"],
         sweeps=len(sw),
         best_init=trace["init_best"],
         best_end=best_fit,
@@ -101,6 +103,8 @@ def run_random(X, y, cfg, seed):
     return dict(
         method="random_search",
         evals_used=state["evals"],
+        rerank_fits=0,
+        total_fits=state["evals"],
         sweeps=0,
         best_init=out["best_init"],
         best_end=out["best_fit"],

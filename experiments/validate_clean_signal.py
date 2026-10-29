@@ -17,6 +17,10 @@ Decision rules (fixed before running):
   d=50  : "reaches >= 4/5"   <=> firefly mean hits >= 4.0
   d=500 : "beats random"     <=> lower mean val fitness AND Wilcoxon p < 0.05
 
+Comparison rule (Day-3 review, F2): all comparisons use RAW masks (equal
+search budget); no method is reranked here.  Rows report evals_used,
+rerank_fits (always 0) and total_fits = evals_used + rerank_fits.
+
 Output: results/validate_clean_signal.csv, entry in results/runs.json.
 """
 
@@ -27,11 +31,11 @@ import time
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
 from _common import RESULTS_DIR, paired_wilcoxon, random_search, warn_once
 
+from src.classifiers import clf_configs, final_clf
 from src.firefly import binary_firefly, make_fitness
 from src.results_store import log_experiment
 
@@ -59,8 +63,8 @@ def make_splits(d: int, seed: int):
 
 
 def holdout_acc(mask, Xs, ys, Xh, yh, seed):
-    # Same LogisticRegression settings as make_fitness.
-    clf = LogisticRegression(max_iter=100, random_state=seed)
+    # Shared final classifier (src.classifiers); seed kept for callers.
+    clf = final_clf()
     clf.fit(Xs[:, mask], ys)
     return float(clf.score(Xh[:, mask], yh))
 
@@ -98,14 +102,16 @@ def main():
                 rows.append({**base, "method": "true_mask", "hits": N_INF,
                              "val_fitness": float(ref_fit(true_mask)),
                              "holdout_acc": holdout_acc(true_mask, Xs, ys, Xh, yh, seed),
-                             "evals_used": 1, "sweeps": 0, "seconds": 0.0, "idx": "0,1,2,3,4"})
+                             "evals_used": 1, "rerank_fits": 0, "total_fits": 1,
+                             "sweeps": 0, "seconds": 0.0, "idx": "0,1,2,3,4"})
                 for method in METHODS:
                     mask, vf, ev, sw, secs = run_one(method, Xs, ys, d, seed)
                     rows.append({**base, "method": method,
                                  "hits": int(mask[:N_INF].sum()),
                                  "val_fitness": vf,
                                  "holdout_acc": holdout_acc(mask, Xs, ys, Xh, yh, seed),
-                                 "evals_used": ev, "sweeps": sw, "seconds": secs,
+                                 "evals_used": ev, "rerank_fits": 0, "total_fits": ev,
+                                 "sweeps": sw, "seconds": secs,
                                  "idx": ",".join(map(str, np.flatnonzero(mask)))})
             done = DS.index(d) * len(SEEDS) + SEEDS.index(seed) + 1
             total_units = len(DS) * len(SEEDS)
@@ -171,7 +177,7 @@ def main():
                     budget=BUDGET, n_fireflies=N_FIREFLIES, n_total=N_TOTAL,
                     n_holdout=N_HOLDOUT, class_sep=2.0, n_clusters_per_class=1,
                     methods=METHODS, data_random_state="seed",
-                    holdout_clf="LogisticRegression(max_iter=100, random_state=seed)"),
+                    holdout_clf=clf_configs()["final_clf"]),
         seeds=SEEDS,
         csv_paths=[str(csv.relative_to(RESULTS_DIR.parent))],
         extra=dict(runtime_s=round(total, 1)),

@@ -143,8 +143,15 @@ def section_stage3():
             rows.append(dict(d=d, metric=metric, raw=raw[metric].mean(), reranked=rr[metric].mean(),
                              mean_diff=w["mean_diff"], n=w["n"], n_nonzero=w["n_nonzero"], p=w["p"],
                              n_changed=int(rr.changed.sum())))
-    cost = df.groupby("d").agg(search_evals=("search_evals", "mean"),
-                               rerank_fits=("rerank_fits", "mean")).reset_index()
+    # Pre-F2 CSVs name the column search_evals and give rerank_fits on both
+    # variants; post-F2 rows give it on the reranked variant only.
+    df = df.rename(columns={"search_evals": "evals_used"})
+    rr_rows = df[df.variant == "reranked"]
+    cost = rr_rows.groupby("d").agg(evals_used=("evals_used", "mean"),
+                                    rerank_fits=("rerank_fits", "mean")).reset_index()
+    cost["total_fits"] = cost.evals_used + cost.rerank_fits
+    if "rerank_s" in rr_rows:
+        cost["rerank_s"] = rr_rows.groupby("d")["rerank_s"].mean().values
     return ("## Stage 3 - re-ranking ablation (`rerank_ablation.csv`, seeds 0-9)\n\n"
             "Noisy toy (class_sep=1.0, 2 clusters/class), 1000 search rows, 5000-row holdout, "
             "k=5, budget=800, top_m=10, 5-fold. mean_diff = reranked - raw.\n\n"

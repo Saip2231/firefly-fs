@@ -100,6 +100,18 @@ def test_run_firefly_separates_costs(data):
     assert int(r["reranked_mask"].sum()) == K
 
 
+def test_run_firefly_total_fits(data):
+    """evals_used / rerank_fits / total_fits are reported and add up (F2)."""
+    X, y = data
+    for top_m, n_splits in ((10, 5), (3, 2), (0, 5)):
+        r = run_firefly(X, y, K, budget=BUDGET, seed=SEED, n_fireflies=10,
+                        rerank_top_m=top_m, n_splits=n_splits)
+        assert r["evals_used"] == r["search_evals"] <= BUDGET
+        assert r["rerank_fits"] == top_m * n_splits
+        assert r["total_fits"] == r["evals_used"] + r["rerank_fits"]
+        assert r["search_s"] > 0 and r["rerank_s"] >= 0
+
+
 def test_top_m_zero_returns_raw_unchanged(data):
     """rerank_top_m=0 -> re-ranked mask is the raw best, no extra fits, and
     the raw search is identical to calling binary_firefly directly."""
