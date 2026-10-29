@@ -111,6 +111,20 @@ def test_frac_seeded_passed_through(data):
     np.testing.assert_array_equal(np.array(rec_a.masks[:N]), expected)
 
 
+def test_shared_prefix_with_frozen_population_sizes():
+    """PREREG disclosure, frozen sizes Firefly 10 / PSO 20: plain populations
+    share all 10 Firefly members; seeded populations share the first 5."""
+    d, k, seed = 64, 16, 0
+    scores = np.random.default_rng(1).random(d)
+    r10 = init_population("random", 10, d, k, np.random.default_rng(seed))
+    r20 = init_population("random", 20, d, k, np.random.default_rng(seed))
+    np.testing.assert_array_equal(r10, r20[:10])
+    s10 = init_population("seeded", 10, d, k, np.random.default_rng(seed), filter_scores=scores)
+    s20 = init_population("seeded", 20, d, k, np.random.default_rng(seed), filter_scores=scores)
+    np.testing.assert_array_equal(s10[:5], s20[:5])
+    assert not np.array_equal(s10, s20[:10])
+
+
 # (d) -----------------------------------------------------------------------
 
 def test_registry_firefly_matches_direct_call(data):

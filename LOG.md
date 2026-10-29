@@ -138,4 +138,12 @@
 - Smoke: `python experiments/run_metaheuristics.py --smoke` (run 20261029_224452_meta_digits, results/smoke/meta_digits.csv): 16 jobs, 32 rows, 29.3 s with 15 workers, every job evals = 150, rerank 1.7-3.2 s. git was b006f11+dirty (Stage 5 files uncommitted; the Day 5 runs must start from a clean commit).
 - Tests: tests/test_runner.py 6 passed (84.7 s, runs the smoke grid itself); pytest tests/ -q -> 123 passed in 252 s (was 69 s before the runner tests).
 - Closes review MAJOR 2 for the runner (thread limits).
+- Committed as 7a23b78 "day4: resumable metaheuristic runner + smoke test".
+
+## 2026-10-29 - day4 stage 6: freeze, PREREG, compute plan
+
+- Decision (user): keep the population sizes exactly as tuned (Firefly 10, PSO 20) and disclose the mismatch.
+- Correction to the Stage-4 note and to results/tuning_decision.md (not edited, it is a committed result): plain populations share Firefly's 10 members, but seeded populations share only their first 5 (the number of score-biased members scales with n). Test added in tests/test_registry.py; PREREG.md states it.
+- New: config/frozen_config.yaml (values from results/tuning_decision.md; test checks they match), PREREG.md (user draft + raw mask as primary, frozen hp, exact k lists and 12 families, tie/NaN rule, disclosed asymmetries incl. review MAJOR 3), experiments/plan_compute.py. experiments/_common.holm gains nan_policy="as_one" (default "exclude" unchanged, so Day-3 outputs are unchanged).
+- Order: commit frozen config -> fill its hash into PREREG.md -> commit PREREG -> tag day5-launch.
 

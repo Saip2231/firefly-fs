@@ -9559,5 +9559,78 @@
       "rows_total": 32,
       "runtime_s": 29.3
     }
+  },
+  {
+    "run_id": "20261029_231932_plan_compute",
+    "timestamp": "2026-10-29T23:19:32.536650+05:30",
+    "dataset": "plan_compute",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "params": {
+      "datasets": [
+        "digits",
+        "cifar_r18"
+      ],
+      "budgets": [
+        800,
+        3000
+      ],
+      "methods": [
+        "firefly",
+        "pso",
+        "firefly_seeded",
+        "pso_seeded"
+      ],
+      "n_seeds": 10,
+      "ks": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "margin": 1.2,
+      "limit_h": 8.0,
+      "contention": {
+        "cifar_r18": 1.229543434525824,
+        "digits": 1.0
+      },
+      "workers": 15
+    },
+    "csv_paths": [
+      "results\\compute_plan.md"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "total_single_h": 20.15,
+      "total_workers_h": 1.34,
+      "git_hash": "7a23b78+dirty"
+    }
   }
 ]

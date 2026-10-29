@@ -99,14 +99,22 @@ def paired_wilcoxon(a, b) -> dict:
     return out
 
 
-def holm(pvals) -> np.ndarray:
+def holm(pvals, nan_policy: str = "exclude") -> np.ndarray:
     """Holm-Bonferroni adjusted p-values, in the input order.
 
-    NaN p-values (undefined tests, e.g. all pairs tied) stay NaN and do not
-    count towards the family size m.  Adjusted values are capped at 1 and
-    made monotone in the sorted order.
+    nan_policy="exclude" (default, used by every Day-3 script): NaN p-values
+    (undefined tests, e.g. all pairs tied) stay NaN and do not count towards
+    the family size m.
+    nan_policy="as_one" (PREREG.md primary analysis): a NaN p is treated as
+    p = 1, so it still counts in m (the family stays at its pre-registered
+    size) and its adjusted value is 1.
+    Adjusted values are capped at 1 and made monotone in the sorted order.
     """
+    if nan_policy not in ("exclude", "as_one"):
+        raise ValueError(f"nan_policy must be 'exclude' or 'as_one', got {nan_policy!r}")
     p = np.asarray(pvals, dtype=float)
+    if nan_policy == "as_one":
+        p = np.where(np.isnan(p), 1.0, p)
     out = np.full(p.shape, np.nan)
     ok = np.flatnonzero(~np.isnan(p))
     m = len(ok)

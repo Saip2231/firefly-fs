@@ -1,0 +1,17 @@
+{
+  "_comment": "FROZEN (Day 4 Stage 6). Hyperparameters from the mechanical decision rule in results/tuning_decision.md. No changes after the 'day4: frozen config' commit (CLAUDE.md rule 10). JSON flow style = valid YAML; loads without PyYAML.",
+  "firefly": {"n_fireflies": 10, "beta0": 0.4, "gamma": 2.0, "alpha": 0.02},
+  "pso": {"n_particles": 20, "w_start": 1.0, "w_end": 0.4, "c1": 1.5, "c2": 1.5, "vmax": 0.5},
+  "frac_seeded": 0.5,
+  "top_m": 10,
+  "n_splits": 5,
+  "provenance": {
+    "tuning_runs": "results/tuning_runs.csv (162 runs, seeds 100-102, git 831fd93)",
+    "tuning_summary_run_id": "20261029_144439_tune_summary",
+    "decision_file": "results/tuning_decision.md",
+    "firefly_decision": "n_fireflies=10 (beats default by 0.0056 >= 0.003)",
+    "pso_decision": "w_start=1.0 (beats default by 0.0030309 >= 0.003)",
+    "fixed_in_code": "binary_pso stall_swap=True; firefly_levy uses the firefly block with levy=True",
+    "population_note": "Population sizes differ (Firefly 10, PSO 20): plain methods share Firefly's 10 members (PSO's first 10 particles); seeded methods share only their first 5 members (firefly_seeded seeds 5 of 10, pso_seeded 10 of 20). Kept as tuned and disclosed in PREREG.md."
+  }
+}

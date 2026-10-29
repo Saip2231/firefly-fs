@@ -20,9 +20,11 @@ Shared initial populations (fairness rule 5)
     Seeded methods build init_population("seeded", n, d, k, default_rng(seed),
     state["filter_scores"], frac_seeded) here and pass it as init_masks, so
     firefly_seeded and pso_seeded also start from the same masks.
-    If the population sizes differ (n_fireflies != n_particles), the smaller
-    population equals the first rows of the larger one (members are drawn
-    one after another), but the populations are not identical.
+    If the population sizes differ (n_fireflies != n_particles), plain
+    methods still share the smaller population (it equals the first rows of
+    the larger one).  Seeded methods share fewer rows: the number of
+    score-biased members scales with n, so the populations agree only up to
+    the smaller seeded count (e.g. 5 rows for n = 10 vs 20 at frac 0.5).
 
 Budget hygiene
     run_search refuses a state that has already been used (state["evals"] !=

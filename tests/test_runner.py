@@ -123,3 +123,19 @@ def test_config_loader_and_hp():
     assert rm.method_hp(cfg, "firefly")["n_fireflies"] == cfg["firefly"]["n_fireflies"]
     ks, skipped = rm.default_ks("digits")
     assert ks == [16, 32] and skipped == [64]
+
+
+def test_frozen_config_matches_tuning_decision():
+    """config/frozen_config.yaml holds exactly the hyperparameters that
+    results/tuning_decision.md froze (plus PSO's explicit default w_end)."""
+    import json
+    import re
+
+    cfg, _ = rm.load_config(rm.FROZEN_CONFIG)
+    text = (ROOT / "results" / "tuning_decision.md").read_text(encoding="utf-8")
+    frozen = [json.loads(m) for m in re.findall(r"Frozen hyperparameters: `(\{.*?\})`", text)]
+    assert len(frozen) == 2                                  # firefly, then pso
+    assert cfg["firefly"] == frozen[0]
+    assert {k: v for k, v in cfg["pso"].items() if k != "w_end"} == frozen[1]
+    assert cfg["pso"]["w_end"] == 0.4                        # binary_pso default
+    assert (cfg["frac_seeded"], cfg["top_m"], cfg["n_splits"]) == (0.5, 10, 5)
