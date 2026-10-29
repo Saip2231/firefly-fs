@@ -88,3 +88,21 @@
 - Interpretation: holdout accuracies are identical under LogisticRegression(max_iter=100, random_state=seed) and final_clf() (max_iter=500, random_state=0). With k=5 features lbfgs converges well before 100 iterations (no ConvergenceWarning was printed), and lbfgs ignores random_state, so both give the same fit. Search outputs were unchanged (all runs used the full budget; the d=500/n=1000/seed-1 outlier reproduces: val 0.3723, 0 hits, holdout 0.494). The Day-3 conclusions do not depend on the holdout classifier's iteration cap.
 - Tests: pytest tests/ -q -> 53 passed.
 - git status before the stage commit: only Stage 0 work uncommitted (scripts, results, LOG.md, toy_check.py, tests/test_firefly.py); cluade.md still untracked.
+
+## 2026-10-29 - day4 stage 1: init_pop, inner-train filter scores, init_masks
+
+- Read-only review of the Day-3/Stage-0 code before Stage 1: 0 BLOCKER, 3 MAJOR, 7 MINOR. MAJORs deferred to their stages: (1) reused make_fitness state silently shrinks the budget -> assert evals == 0 in run_search (Stage 3); (2) BLAS threads + discrete fitness ties -> thread env vars in every runner (Stage 5); (3) baselines fit on all 8000 rows, wrapper search on <= 2000 -> state in PREREG (Stage 6).
+- New: src/init_pop.py (init_population random/seeded, top_k_mask, check_init_masks); make_fitness exposes state["filter_scores"] = nan_to_num(f_classif) on inner-train rows only; binary_firefly(init_masks=None).
+- Tests: tests/test_init_pop.py 26 passed; pytest tests/ -q -> 79 passed. `python experiments/golden_day3.py --compare` -> 33 identical, 0 changed.
+- Expected warnings on digits: f_classif reports constant columns [0 24 32 39] on the inner-train rows (NaN F -> 0), printed once per type.
+- Committed as "day4: init_pop, inner-train filter scores, init_masks".
+
+## 2026-10-29 - day4 stage 2: PSO with random-key (top-k) decoding (in progress)
+
+- New: src/pso.py binary_pso (same interface as binary_firefly; same initial population as Firefly for the same seed), tests/test_pso.py, experiments/sanity_pso.py (clean-signal toy from validate_clean_signal.py, d 50/500, n_search 1000/2000, seeds 0-9, budget 600).
+- v0, plain PSO as specified (results/sanity_pso_v0_noreset.csv, sanity_pso_tests_v0_noreset.csv): tests 90 passed, but PSO val_fitness above random search in 4/4 settings; every PSO run hit the 10*T iteration cap with budget unspent (mean evals_used 210 at d=50/n_search=2000, 477 and 461 at d=500). Cause: swarm collapses onto the gbest mask, every decoded mask is then a cache hit. Not a coding bug.
+- v1, velocity redraw U(-vmax, vmax) after an iteration with 0 new evals (run 20261029_133804_sanity_pso, results/sanity_pso_v1_velreset.csv): tests 92 passed; resets fired (mean 172-263 per run) but only 2/40 PSO runs spent the budget (min evals_used 89); val_fitness still above random search in 4/4. Cause: kicks of <= w*vmax are pulled back before any key crosses the top-k threshold.
+- v2 (approved): replaced the velocity redraw with a Firefly-style stall swap (one random key swap per particle when the moves of an iteration give 0 new evals; same rule as Firefly F3). Acceptance fixed before the run, on budget use only: >= 38/40 PSO runs spend the full budget.
+- v2 result (run 20261029_135554_sanity_pso, results/sanity_pso.csv, sanity_pso_tests.csv): tests 15 PSO / 94 total passed. Acceptance PASS: 40/40 PSO runs used exactly 600 evals (stall fallback fired in a mean of 3.6-8.6 iterations per run). Stage-2 expectation (PSO mean val_fitness <= random search) met in 2/4 settings: d=50 lower (-0.0016, p=0.66; -0.0026, p=0.0625), d=500 higher (+0.0408, p=0.47; +0.0687, p=0.73); every Holm-adjusted p >= 0.5, so no setting differs detectably (n=10, exploratory).
+- d=500 gap = a few stuck runs, not a shift: PSO val_fitness ~0.38-0.41 with 0 informative columns at (n_search=1000, seed 1), (2000, seed 1), (2000, seed 2); Firefly is also stuck at (1000, seed 1), the known Day-3 d=500 seed-1 outlier. With 5 informative columns out of 500, a random 5-mask contains one with probability ~5%, so a local search started from 20 masks can begin with no signal, while random search samples 600 masks globally. Not a bug; PSO hyperparameters were not changed (rule 10).
+

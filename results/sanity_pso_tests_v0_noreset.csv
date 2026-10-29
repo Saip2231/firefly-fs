@@ -1,0 +1,9 @@
+d,n_search,comparison,metric,n,n_nonzero,mean_diff,stat,p,p_holm,direction
+50,1000,pso - random_search,val_fitness,10,5,0.0039600000000000034,3.0,0.3125,1.0,higher
+50,1000,pso - random_search,sep_hits,10,5,-0.2,5.0,0.75,1.0,lower
+50,2000,pso - random_search,val_fitness,10,5,0.002574000000000002,3.0,0.3125,1.0,higher
+50,2000,pso - random_search,sep_hits,10,2,0.0,1.5,1.0,1.0,equal
+500,1000,pso - random_search,val_fitness,10,9,0.118404,3.0,0.01953125,0.15625,higher
+500,1000,pso - random_search,sep_hits,10,4,-0.4,0.0,0.125,0.875,lower
+500,2000,pso - random_search,val_fitness,10,9,0.178992,10.0,0.16015625,0.9609375,higher
+500,2000,pso - random_search,sep_hits,10,6,-0.4,3.5,0.21875,1.0,lower

@@ -8793,5 +8793,198 @@
     "extra": {
       "runtime_s": 51.9
     }
+  },
+  {
+    "run_id": "20261029_132402_sanity_pso",
+    "timestamp": "2026-10-29T13:24:02.499066+05:30",
+    "dataset": "sanity_pso",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "ds": [
+        50,
+        500
+      ],
+      "n_search": [
+        1000,
+        2000
+      ],
+      "n_informative": 5,
+      "ks": [
+        5
+      ],
+      "budget": 600,
+      "n_population": 20,
+      "class_sep": 2.0,
+      "n_clusters_per_class": 1,
+      "methods": [
+        "random_search",
+        "firefly",
+        "pso"
+      ],
+      "data": "validate_clean_signal.make_splits",
+      "pso": "random-key (top-k) decoding, defaults",
+      "holdout_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "multiple_testing": "holm, 8 tests (pso vs random_search)"
+    },
+    "csv_paths": [
+      "results\\sanity_pso.csv",
+      "results\\sanity_pso_tests.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 183.7
+    }
+  },
+  {
+    "run_id": "20261029_133804_sanity_pso",
+    "timestamp": "2026-10-29T13:38:04.102804+05:30",
+    "dataset": "sanity_pso",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "ds": [
+        50,
+        500
+      ],
+      "n_search": [
+        1000,
+        2000
+      ],
+      "n_informative": 5,
+      "ks": [
+        5
+      ],
+      "budget": 600,
+      "n_population": 20,
+      "class_sep": 2.0,
+      "n_clusters_per_class": 1,
+      "methods": [
+        "random_search",
+        "firefly",
+        "pso"
+      ],
+      "data": "validate_clean_signal.make_splits",
+      "pso": "random-key (top-k) decoding, defaults, stall_reset=True",
+      "holdout_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "multiple_testing": "holm, 8 tests (pso vs random_search)"
+    },
+    "csv_paths": [
+      "results\\sanity_pso.csv",
+      "results\\sanity_pso_tests.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 163.8
+    }
+  },
+  {
+    "run_id": "20261029_135554_sanity_pso",
+    "timestamp": "2026-10-29T13:55:54.802517+05:30",
+    "dataset": "sanity_pso",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "ds": [
+        50,
+        500
+      ],
+      "n_search": [
+        1000,
+        2000
+      ],
+      "n_informative": 5,
+      "ks": [
+        5
+      ],
+      "budget": 600,
+      "n_population": 20,
+      "class_sep": 2.0,
+      "n_clusters_per_class": 1,
+      "methods": [
+        "random_search",
+        "firefly",
+        "pso"
+      ],
+      "data": "validate_clean_signal.make_splits",
+      "pso": "random-key (top-k) decoding, defaults, stall_swap=True",
+      "acceptance": ">= 38/40 PSO runs spend the full budget",
+      "holdout_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "multiple_testing": "holm, 8 tests (pso vs random_search)"
+    },
+    "csv_paths": [
+      "results\\sanity_pso.csv",
+      "results\\sanity_pso_tests.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 194.3
+    }
   }
 ]
