@@ -33,14 +33,26 @@ binary_firefly  (v2 — three targeted fixes)
         it is ~10 flips for k=16-128, effectively a random restart after
         repair.  Replacement: apply exactly n_swaps random swaps, where each
         swap removes one selected feature and adds one unselected one.
-        n_swaps is drawn from Uniform{1, max_swaps} with max_swaps=max(1,
-        round(alpha*k)).  This keeps mutation proportional to the subset
-        size, not the ambient dimension.
+        n_swaps is drawn from Uniform{1, ..., max_swaps} with max_swaps =
+        max(1, round(alpha*k)), so its mean is (1 + max_swaps)/2 (not
+        max_swaps).  This keeps mutation proportional to the subset size,
+        not the ambient dimension -- but only once alpha*k >= 1.5:
+          * Python's round() rounds half to even, so at the default
+            alpha=0.02, round(alpha*k) = 0 for k < 25 and = 1 for
+            25 <= k <= 74; max_swaps = 1 for every k <= 74.
+          * alpha decays geometrically (x0.98 per sweep), which can only
+            lower round(alpha*k); for k <= 74 the decay has NO effect.
+          * Example: k=128 gives alpha*k = 2.56 -> max_swaps = 3 at first.
 
-        The optional long-jump mutation (levy=True) uses 3x the normal swap
-        count on 10% of moves.  This is a heavy-tailed discrete step, NOT
-        a true Levy flight (which requires a power-law step-size distribution).
-        Call it "long-jump" or "heavy-tailed mutation" in any report.
+        The optional long-jump mutation (levy=True) applies on 10% of moves
+        and draws n_swaps from Uniform{1, ..., 3*max_swaps}, i.e. at most 3x
+        the usual maximum (at k <= 74: 1-3 swaps instead of exactly 1).  It is
+        NOT a Levy flight (no power-law step distribution) and not
+        heavy-tailed; call it "long-jump mutation" in any report.
+
+    NOTE ON DAY-3 RESULTS: every Day-3 synthetic run used k = 5 or 10 at
+    alpha=0.02, i.e. exactly ONE swap per move (1-3 with long-jump), with
+    alpha decay inactive.  Those results describe that operator only.
 
     FIX 2 — Distance normalised by 2k (max possible Hamming between
         k-subsets).
@@ -274,9 +286,12 @@ def binary_firefly(
     gamma       : Light absorption coefficient.  Acts on
                   r = Hamming / (2*min(k, d-k)), which is in [0, 1].
     budget, k   : ValueError unless budget >= 1 and 1 <= k < d.
-    alpha       : Controls mutation magnitude.  Expected swaps per move =
-                  max(1, round(alpha * k)).  Scale-invariant w.r.t. d.
-    levy        : If True, 10% of moves use 3x the normal swap count.
+    alpha       : Controls mutation magnitude.  Swaps per move are uniform on
+                  1..max_swaps with max_swaps = max(1, round(alpha * k)),
+                  mean (1 + max_swaps)/2.  At alpha=0.02, max_swaps = 1 for
+                  all k <= 74 (and alpha decay then has no effect).
+    levy        : If True, 10% of moves draw swaps from 1..3*max_swaps
+                  ("long-jump mutation"; not a Levy flight).
     seed        : RNG seed for full reproducibility.
 
     Returns
@@ -406,9 +421,9 @@ def binary_firefly(
                     candidate[copy_bits] = positions[j][copy_bits]
 
                 # -- FIX 1: Swap-based mutation scaled to k ------------------
-                # n_swaps ~ Uniform{1, max_swaps}, max_swaps proportional to k.
-                # This keeps mutation magnitude constant relative to the
-                # subset size, independent of ambient dimension d.
+                # n_swaps ~ Uniform{1, max_swaps}, max_swaps = max(1,
+                # round(alpha*k)) -> mean (1+max_swaps)/2; equals 1 for
+                # k <= 74 at alpha=0.02 (see module docstring).
                 max_swaps = max(1, round(alpha_cur * k))
                 if levy and rng.random() < 0.1:
                     max_swaps = max(1, 3 * max_swaps)   # long-jump: 3x swaps
@@ -522,7 +537,8 @@ def binary_firefly(
                 "stall_proposals":   _sw_stall,
             })
 
-        # Geometric alpha decay: reduce exploration over time
+        # Geometric alpha decay.  Only changes max_swaps once alpha*k >= 1.5
+        # (k >= 75 at alpha=0.02); below that it has no effect.
         alpha_cur *= 0.98
 
         # (No early termination on a tie-stall any more: see F3 block above.

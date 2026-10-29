@@ -9,6 +9,7 @@
    day3 commit; a commit cannot contain its own hash), numpy / scikit-learn
    versions, seeds and runtimes (from results/runs.json), pytest outcome.
    Refuses to append a second day3 entry for the same date.
+   Pass --no-log to regenerate day3_summary.md only (used by day3-fixes F5).
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 
-from _common import RESULTS_DIR, ROOT, paired_wilcoxon
+from _common import RESULTS_DIR, ROOT, direction, holm, paired_wilcoxon
 
 from src.results_store import capture_pytest_results, load_all_runs
 
@@ -75,6 +76,55 @@ def read(name: str) -> pd.DataFrame:
     return pd.read_csv(RESULTS_DIR / name)
 
 
+PRE_F1_HOLDOUT_CLF = "LogisticRegression(max_iter=100, random_state=seed) (pre-F1 code)"
+
+
+def holdout_clf_used(experiment: str) -> str:
+    """Holdout classifier of the latest logged run of `experiment` (runs.json)."""
+    rec = None
+    for r in load_all_runs():
+        if r.get("dataset") == experiment:
+            rec = r
+    if rec is None:
+        return "no run logged"
+    return (rec.get("params", {}).get("holdout_clf")
+            or rec.get("classifiers", {}).get("final_clf")
+            or PRE_F1_HOLDOUT_CLF)
+
+
+def stage2_tests(df: pd.DataFrame) -> pd.DataFrame:
+    """Firefly / firefly_levy vs random_search on every metric, one Holm family."""
+    tests = []
+    for (d, ns), gg in df.groupby(["d", "n_search"]):
+        rs = gg[gg.method == "random_search"].sort_values("seed")
+        for m in ("firefly", "firefly_levy"):
+            fm = gg[gg.method == m].sort_values("seed")
+            for metric in ("holdout_acc", "sep_hits", "hits", "val_fitness"):
+                w = paired_wilcoxon(fm[metric].values, rs[metric].values)
+                tests.append(dict(d=d, n_search=ns, method=m, metric=metric,
+                                  direction=direction(w["mean_diff"]), mean_diff=w["mean_diff"],
+                                  n=w["n"], n_nonzero=w["n_nonzero"], p=w["p"]))
+    t = pd.DataFrame(tests)
+    t["p_holm"] = holm(t.p.values)
+    return t
+
+
+def stage3_tests(df: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for d, g in df.groupby("d"):
+        raw = g[g.variant == "raw"].sort_values("seed")
+        rr = g[g.variant == "reranked"].sort_values("seed")
+        for metric in ("holdout_acc", "sep_hits", "hits"):
+            w = paired_wilcoxon(rr[metric].values, raw[metric].values)
+            rows.append(dict(d=d, metric=metric, raw=raw[metric].mean(), reranked=rr[metric].mean(),
+                             direction=direction(w["mean_diff"]), mean_diff=w["mean_diff"],
+                             n=w["n"], n_nonzero=w["n_nonzero"], p=w["p"],
+                             n_changed=int(rr.changed.sum())))
+    t = pd.DataFrame(rows)
+    t["p_holm"] = holm(t.p.values)
+    return t
+
+
 # ---------------------------------------------------------------------------
 # summary sections (CSV numbers only)
 # ---------------------------------------------------------------------------
@@ -103,21 +153,17 @@ def section_stage2():
              holdout_acc=pm(x.holdout_acc), evals_used=f"{x.evals_used.mean():.1f}")
         for (d, ns, m), x in df.groupby(["d", "n_search", "method"])
     ])
-    tests = []
-    for (d, ns), gg in df.groupby(["d", "n_search"]):
-        rs = gg[gg.method == "random_search"].sort_values("seed")
-        for m in ("firefly", "firefly_levy"):
-            fm = gg[gg.method == m].sort_values("seed")
-            for metric in ("val_fitness", "sep_hits"):
-                w = paired_wilcoxon(fm[metric].values, rs[metric].values)
-                tests.append(dict(d=d, n_search=ns, method=m, metric=metric, n=w["n"],
-                                  n_nonzero=w["n_nonzero"], mean_diff=w["mean_diff"], p=w["p"]))
     return ("## Stage 2 - clean signal (`validate_clean_signal_rescored.csv`, seeds 0-9)\n\n"
             "class_sep=2.0, 1 cluster/class, k=5, budget=600, 5000-row independent holdout. "
             "`sep_*` count only informative columns whose class means differ "
-            "(`separating_columns_clean_signal.csv`).\n\n" + md_table(t)
-            + "\n\nPaired Wilcoxon vs random_search (two-sided, mean_diff = method - random):\n\n"
-            + md_table(pd.DataFrame(tests)))
+            "(`separating_columns_clean_signal.csv`). Primary metrics: holdout_acc and sep_hits; "
+            "hits and val_fitness are secondary (val_fitness is in-sample: it is the objective "
+            "the search minimised on the rows that chose the mask). "
+            f"Holdout classifier: {holdout_clf_used('validate_clean_signal')}.\n\n" + md_table(t)
+            + "\n\nPaired two-sided Wilcoxon vs random_search (mean_diff = method - random; "
+              "zero differences dropped). p_holm: Holm correction across all rows of this table. "
+              "Primary test: holdout_acc, firefly, d=500, n_search=2000.\n\n"
+            + md_table(stage2_tests(df)))
 
 
 def section_seed1():
@@ -134,15 +180,7 @@ def section_seed1():
 
 def section_stage3():
     df = read("rerank_ablation.csv")
-    rows = []
-    for d, g in df.groupby("d"):
-        raw = g[g.variant == "raw"].sort_values("seed")
-        rr = g[g.variant == "reranked"].sort_values("seed")
-        for metric in ("hits", "sep_hits", "holdout_acc"):
-            w = paired_wilcoxon(rr[metric].values, raw[metric].values)
-            rows.append(dict(d=d, metric=metric, raw=raw[metric].mean(), reranked=rr[metric].mean(),
-                             mean_diff=w["mean_diff"], n=w["n"], n_nonzero=w["n_nonzero"], p=w["p"],
-                             n_changed=int(rr.changed.sum())))
+    tests = stage3_tests(df)
     # Pre-F2 CSVs name the column search_evals and give rerank_fits on both
     # variants; post-F2 rows give it on the reranked variant only.
     df = df.rename(columns={"search_evals": "evals_used"})
@@ -154,8 +192,11 @@ def section_stage3():
         cost["rerank_s"] = rr_rows.groupby("d")["rerank_s"].mean().values
     return ("## Stage 3 - re-ranking ablation (`rerank_ablation.csv`, seeds 0-9)\n\n"
             "Noisy toy (class_sep=1.0, 2 clusters/class), 1000 search rows, 5000-row holdout, "
-            "k=5, budget=800, top_m=10, 5-fold. mean_diff = reranked - raw.\n\n"
-            + md_table(pd.DataFrame(rows)) + "\n\nCost per run:\n\n" + md_table(cost))
+            "k=5, budget=800, top_m=10, 5-fold. Ablation: reranked vs raw mask of the SAME "
+            "search (never against another method). mean_diff = reranked - raw; p_holm across "
+            f"the rows of this table. Holdout classifier: {holdout_clf_used('rerank_ablation')}.\n\n"
+            + md_table(tests) + "\n\nCost per run (reranked variant; raw uses evals_used only):\n\n"
+            + md_table(cost))
 
 
 def section_stage4():
@@ -176,43 +217,61 @@ def section_does_not_show():
     fq = read("check_d500_seed1_freq.csv")
     ra = read("rerank_ablation.csv")
 
+    t2, t3 = stage2_tests(s2), stage3_tests(ra)
+
     def recall(d, ns, m):
         return s2[(s2.d == d) & (s2.n_search == ns) & (s2.method == m)].sep_recall.mean()
 
-    def w_vf(ns):
-        g = s2[(s2.d == 500) & (s2.n_search == ns)]
-        return paired_wilcoxon(g[g.method == "firefly"].sort_values("seed").val_fitness.values,
-                               g[g.method == "random_search"].sort_values("seed").val_fitness.values)
+    def row(t, **kw):
+        sel = np.logical_and.reduce([t[c] == v for c, v in kw.items()])
+        return t[sel].iloc[0]
 
-    w1, w2 = w_vf(1000), w_vf(2000)
+    def stat(r):
+        return (f"{r.direction} (mean diff {r.mean_diff:+.4f}, p={r.p:.4f}, "
+                f"Holm-adjusted p={r.p_holm:.4f}, n={r.n})")
+
+    prim = row(t2, d=500, n_search=2000, method="firefly", metric="holdout_acc")
+    vf1 = row(t2, d=500, n_search=1000, method="firefly", metric="val_fitness")
+    vf2 = row(t2, d=500, n_search=2000, method="firefly", metric="val_fitness")
+    sh50 = row(t2, d=50, n_search=1000, method="firefly", metric="sep_hits")
     zf = int((fq[fq.method == "firefly"].hits == 0).sum())
     zr = int((fq[fq.method == "random_search"].hits == 0).sum())
-
-    def w_ho(d):
-        g = ra[ra.d == d]
-        return paired_wilcoxon(g[g.variant == "reranked"].sort_values("seed").holdout_acc.values,
-                               g[g.variant == "raw"].sort_values("seed").holdout_acc.values)
-
-    h50, h500 = w_ho(50), w_ho(500)
+    h50 = row(t3, d=50, metric="holdout_acc")
+    h500 = row(t3, d=500, metric="holdout_acc")
     n_changed = int(ra[ra.variant == "reranked"].changed.sum())
     n_runs = int((ra.variant == "reranked").sum())
+    n_sig = int((t2.p_holm < 0.05).sum())
     return "\n".join([
         "## What this does and does not show", "",
-        f"- On clean synthetic data (d=50, 1000 search rows) Firefly's mean recall of separating "
-        f"columns was {recall(50, 1000, 'firefly'):.3f} vs {recall(50, 1000, 'random_search'):.3f} "
-        f"for random search; at d=50 it did not outperform random search. It does not show "
-        f"recovery of all 5 informative columns: only columns whose class means differ carry "
-        f"linear signal, and validation error reached its floor before all were selected.",
-        f"- At d=500 Firefly had lower validation fitness than random search with 2000 search rows "
-        f"(mean diff {w2['mean_diff']:+.4f}, p={w2['p']:.4f}, n={w2['n']}) but not with 1000 "
-        f"(mean diff {w1['mean_diff']:+.4f}, p={w1['p']:.4f}, n={w1['n']}); on one dataset over "
-        f"{len(fq) // 2} algorithm seeds it ended with 0 hits in {zf} runs vs {zr} for random "
-        f"search. All of this is synthetic data; it shows nothing yet about the image embeddings.",
-        f"- Re-ranking changed the selected mask in {n_changed}/{n_runs} runs; holdout accuracy "
-        f"changed by {h50['mean_diff']:+.4f} (p={h50['p']:.4f}) at d=50 and "
-        f"{h500['mean_diff']:+.4f} (p={h500['p']:.4f}) at d=500, n=10 each, which is not a "
-        f"significant difference. Timing measures cost per evaluation only, not accuracy on "
-        f"the real data.",
+        "No result below is described as \"beats\" or \"better\": each comparison is given as "
+        "higher/lower with its raw and Holm-adjusted p. With n=10 seeds the smallest two-sided "
+        "p is about 0.002, so power is limited and a non-significant result is not evidence of "
+        f"equality. In the Stage 2 family, {n_sig} of {len(t2)} tests have Holm-adjusted p < 0.05.",
+        "",
+        f"- Primary test (clean signal, d=500, 2000 search rows): Firefly's holdout accuracy vs "
+        f"random search was {stat(prim)}.",
+        f"- Clean signal, d=50, 1000 search rows: mean recall of separating columns was "
+        f"{recall(50, 1000, 'firefly'):.3f} (Firefly) vs {recall(50, 1000, 'random_search'):.3f} "
+        f"(random search); Firefly sep_hits was {stat(sh50)}. It does not show recovery of all 5 "
+        f"informative columns: only columns whose class means differ carry linear signal.",
+        f"- Validation fitness at d=500 (secondary, in-sample): with 2000 search rows "
+        f"Firefly's was {stat(vf2)}; with 1000 rows it was {stat(vf1)}. Lower validation "
+        f"fitness on the rows that selected the mask is not evidence of better generalisation.",
+        f"- On one dataset (d=500, data seed 1) over {len(fq) // 2} algorithm seeds Firefly "
+        f"ended with 0 informative hits in {zf} runs vs {zr} for random search (descriptive, "
+        f"no test).",
+        f"- Re-ranking (ablation, same search) changed the selected mask in {n_changed}/{n_runs} "
+        f"runs; holdout accuracy was {h50.direction} at d=50 (mean diff {h50.mean_diff:+.4f}, "
+        f"p={h50.p:.4f}, Holm p={h50.p_holm:.4f}) and {h500.direction} at d=500 (mean diff "
+        f"{h500.mean_diff:+.4f}, p={h500.p:.4f}, Holm p={h500.p_holm:.4f}), n=10 each; re-ranking "
+        f"also costs extra fits (see cost table).",
+        "- Operator caveat: every Day-3 synthetic run used k=5 or 10 at alpha=0.02, i.e. exactly "
+        "one swap per move (1-3 with long-jump); alpha decay had no effect. Results describe that "
+        "operator only.",
+        f"- Holdout classifiers used by the CSVs above: Stage 2 "
+        f"{holdout_clf_used('validate_clean_signal')}; Stage 3 "
+        f"{holdout_clf_used('rerank_ablation')}. All of this is synthetic data; it shows nothing "
+        f"yet about the image embeddings. Timing measures cost per evaluation only.",
     ])
 
 
@@ -240,6 +299,9 @@ def main():
     summary_path = RESULTS_DIR / "day3_summary.md"
     summary_path.write_text("\n".join(parts), encoding="utf-8")
     print(f"Wrote {summary_path}")
+    if "--no-log" in sys.argv[1:]:
+        print("--no-log: LOG.md not touched.")
+        return
 
     # -- LOG.md ----------------------------------------------------------------
     today = datetime.now().strftime("%Y-%m-%d")

@@ -84,7 +84,14 @@ def main():
         return pd.Series(dict(n_sep=len(sep), sep_hits=sh,
                               sep_recall=sh / len(sep) if sep else np.nan,
                               dead_hits=int(r.hits) - sh))
-    out = pd.concat([df, df.apply(score, axis=1)], axis=1)
+    scored = df.apply(score, axis=1)
+    # Post-F5 validate_clean_signal.csv already has sep_hits / n_sep computed
+    # the same way; they must agree, then the rescored values replace them.
+    for c in ("sep_hits", "n_sep"):
+        if c in df:
+            assert (df[c].astype(int).values == scored[c].astype(int).values).all(), \
+                f"{c} in validate_clean_signal.csv disagrees with the rescore"
+    out = pd.concat([df.drop(columns=[c for c in scored.columns if c in df]), scored], axis=1)
 
     print("\nMEAN +/- STD per (d, n_search, method)   [n=10 seeds]")
     order = {m: i for i, m in enumerate(["firefly", "firefly_levy", "random_search", "true_mask"])}

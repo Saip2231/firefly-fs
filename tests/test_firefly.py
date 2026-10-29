@@ -10,9 +10,10 @@ Test inventory
     2 columns); budget respected.  Threshold reasons are documented beside
     PLANTED_CONFIGS.
 
-(b) beats_random
-    Averaged over 5 seeds, Firefly should achieve lower mean fitness
-    than pure random search given the same evaluation budget.
+(b) not_worse_than_random
+    Averaged over 5 seeds, Firefly's mean validation fitness should be lower
+    than pure random search's at the same evaluation budget.  A smoke check,
+    not a statistical claim.
     Random search baseline: sample budget random valid masks, keep best.
 
 (c) reproducibility
@@ -137,7 +138,7 @@ def test_planted_features(name):
 
 
 # ---------------------------------------------------------------------------
-# (b) Firefly beats pure random search
+# (b) Firefly not worse than pure random search (smoke check, no claim)
 # ---------------------------------------------------------------------------
 
 def _random_search_fitness(fitness, state, d, k, budget, seed):
@@ -154,8 +155,12 @@ def _random_search_fitness(fitness, state, d, k, budget, seed):
     return best_fit
 
 
-def test_firefly_beats_random():
-    """Firefly mean fitness < random-search mean fitness (averaged over 5 seeds)."""
+def test_firefly_not_worse_than_random():
+    """Firefly mean val fitness < random-search mean val fitness over 5 seeds.
+
+    Smoke check only: it makes NO statistical claim (no test, n=5, in-sample
+    validation fitness on one toy).  The threshold is unchanged from Day 3.
+    """
     d      = 50
     k      = 5
     budget = 400    # shared budget between FA and random search
@@ -186,7 +191,7 @@ def test_firefly_beats_random():
     mean_rnd = float(np.mean(rnd_fits))
 
     assert mean_fa < mean_rnd, (
-        f"Firefly ({mean_fa:.4f}) did not beat random search ({mean_rnd:.4f})"
+        f"Firefly mean val fitness ({mean_fa:.4f}) not below random search ({mean_rnd:.4f})"
     )
 
 

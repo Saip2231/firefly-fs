@@ -83,6 +83,29 @@ def paired_wilcoxon(a, b) -> dict:
     return out
 
 
+def holm(pvals) -> np.ndarray:
+    """Holm-Bonferroni adjusted p-values, in the input order.
+
+    NaN p-values (undefined tests, e.g. all pairs tied) stay NaN and do not
+    count towards the family size m.  Adjusted values are capped at 1 and
+    made monotone in the sorted order.
+    """
+    p = np.asarray(pvals, dtype=float)
+    out = np.full(p.shape, np.nan)
+    ok = np.flatnonzero(~np.isnan(p))
+    m = len(ok)
+    running = 0.0
+    for rank, i in enumerate(ok[np.argsort(p[ok], kind="stable")]):
+        running = max(running, min(1.0, (m - rank) * p[i]))
+        out[i] = running
+    return out
+
+
+def direction(mean_diff: float) -> str:
+    """'higher' / 'lower' / 'equal' for a paired mean difference."""
+    return "higher" if mean_diff > 0 else "lower" if mean_diff < 0 else "equal"
+
+
 def random_search(fitness, state, d: int, k: int, budget: int, seed: int,
                   init_n: int = 20):
     """Random valid k-masks until `budget` NEW evals are used.
