@@ -26,16 +26,16 @@ Verdicts:
 
 ## Stage 2 - clean signal (`validate_clean_signal_rescored.csv`, seeds 0-9)
 
-class_sep=2.0, 1 cluster/class, k=5, budget=600, 5000-row independent holdout. `sep_*` count only informative columns whose class means differ (`separating_columns_clean_signal.csv`). Primary metrics: holdout_acc and sep_hits; hits and val_fitness are secondary (val_fitness is in-sample: it is the objective the search minimised on the rows that chose the mask). Holdout classifier: LogisticRegression(max_iter=100, random_state=seed).
+class_sep=2.0, 1 cluster/class, k=5, budget=600, 5000-row independent holdout. `sep_*` count only informative columns whose class means differ (`separating_columns_clean_signal.csv`). Primary metrics: holdout_acc and sep_hits; hits and val_fitness are secondary (val_fitness is in-sample: it is the objective the search minimised on the rows that chose the mask). Holdout classifier: LogisticRegression(max_iter=500, random_state=0).
 
 | d | n_search | method | n | hits | sep_hits | n_sep | sep_recall | val_fitness | holdout_acc | evals_used |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 50 | 1000 | firefly | 10 | 2.80 | 2.10 | 3.20 | 0.7250 ± 0.2486 | 0.0061 ± 0.0019 | 0.9899 ± 0.0057 | 543.3 |
-| 50 | 1000 | firefly_levy | 10 | 2.60 | 2.20 | 3.20 | 0.7500 ± 0.2357 | 0.0073 ± 0.0033 | 0.9908 ± 0.0036 | 548.9 |
+| 50 | 1000 | firefly | 10 | 2.80 | 2.10 | 3.20 | 0.7250 ± 0.2486 | 0.0061 ± 0.0019 | 0.9899 ± 0.0057 | 600.0 |
+| 50 | 1000 | firefly_levy | 10 | 2.60 | 2.20 | 3.20 | 0.7500 ± 0.2357 | 0.0073 ± 0.0033 | 0.9908 ± 0.0036 | 600.0 |
 | 50 | 1000 | random_search | 10 | 2.70 | 2.20 | 3.20 | 0.7500 ± 0.2357 | 0.0097 ± 0.0041 | 0.9899 ± 0.0046 | 600.0 |
 | 50 | 1000 | true_mask | 10 | 5.00 | 3.20 | 3.20 | 1.0000 ± 0.0000 | 0.0077 ± 0.0033 | 0.9923 ± 0.0031 | 1.0 |
-| 50 | 2000 | firefly | 10 | 2.60 | 2.20 | 3.20 | 0.7500 ± 0.2357 | 0.0075 ± 0.0057 | 0.9912 ± 0.0032 | 554.8 |
-| 50 | 2000 | firefly_levy | 10 | 2.90 | 2.30 | 3.20 | 0.7750 ± 0.2189 | 0.0069 ± 0.0045 | 0.9908 ± 0.0034 | 534.4 |
+| 50 | 2000 | firefly | 10 | 2.60 | 2.20 | 3.20 | 0.7500 ± 0.2357 | 0.0075 ± 0.0057 | 0.9912 ± 0.0032 | 600.0 |
+| 50 | 2000 | firefly_levy | 10 | 2.90 | 2.30 | 3.20 | 0.7750 ± 0.2189 | 0.0069 ± 0.0045 | 0.9908 ± 0.0034 | 600.0 |
 | 50 | 2000 | random_search | 10 | 2.50 | 2.20 | 3.20 | 0.7500 ± 0.2357 | 0.0095 ± 0.0073 | 0.9899 ± 0.0042 | 600.0 |
 | 50 | 2000 | true_mask | 10 | 5.00 | 3.20 | 3.20 | 1.0000 ± 0.0000 | 0.0067 ± 0.0041 | 0.9923 ± 0.0031 | 1.0 |
 | 500 | 1000 | firefly | 10 | 1.20 | 1.20 | 3.20 | 0.3750 ± 0.1768 | 0.0678 ± 0.1082 | 0.9102 ± 0.1485 | 600.0 |
@@ -93,7 +93,7 @@ Paired two-sided Wilcoxon vs random_search (mean_diff = method - random; zero di
 
 ## Stage 3 - re-ranking ablation (`rerank_ablation.csv`, seeds 0-9)
 
-Noisy toy (class_sep=1.0, 2 clusters/class), 1000 search rows, 5000-row holdout, k=5, budget=800, top_m=10, 5-fold. Ablation: reranked vs raw mask of the SAME search (never against another method). mean_diff = reranked - raw; p_holm across the rows of this table. Holdout classifier: LogisticRegression(max_iter=100, random_state=seed) (pre-F1 code).
+Noisy toy (class_sep=1.0, 2 clusters/class), 1000 search rows, 5000-row holdout, k=5, budget=800, top_m=10, 5-fold. Ablation: reranked vs raw mask of the SAME search (never against another method). mean_diff = reranked - raw; p_holm across the rows of this table. Holdout classifier: LogisticRegression(max_iter=500, random_state=0).
 
 | d | metric | raw | reranked | direction | mean_diff | n | n_nonzero | p | n_changed | p_holm |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -106,10 +106,10 @@ Noisy toy (class_sep=1.0, 2 clusters/class), 1000 search rows, 5000-row holdout,
 
 Cost per run (reranked variant; raw uses evals_used only):
 
-| d | evals_used | rerank_fits | total_fits |
-|---|---|---|---|
-| 50 | 800.0000 | 50.0000 | 850.0000 |
-| 500 | 800.0000 | 50.0000 | 850.0000 |
+| d | evals_used | rerank_fits | total_fits | rerank_s |
+|---|---|---|---|---|
+| 50 | 800.0000 | 50.0000 | 850.0000 | 0.1856 |
+| 500 | 800.0000 | 50.0000 | 850.0000 | 0.1550 |
 
 ## Stage 4 - fitness timing (`time_fitness.csv`, seconds per NEW evaluation, single thread, max_rows=2000)
 
@@ -135,4 +135,4 @@ No result below is described as "beats" or "better": each comparison is given as
 - On one dataset (d=500, data seed 1) over 30 algorithm seeds Firefly ended with 0 informative hits in 4 runs vs 0 for random search (descriptive, no test).
 - Re-ranking (ablation, same search) changed the selected mask in 14/20 runs; holdout accuracy was higher at d=50 (mean diff +0.0019, p=1.0000, Holm p=1.0000) and higher at d=500 (mean diff +0.0058, p=0.1562, Holm p=0.9375), n=10 each; re-ranking also costs extra fits (see cost table).
 - Operator caveat: every Day-3 synthetic run used k=5 or 10 at alpha=0.02, i.e. exactly one swap per move (1-3 with long-jump); alpha decay had no effect. Results describe that operator only.
-- Holdout classifiers used by the CSVs above: Stage 2 LogisticRegression(max_iter=100, random_state=seed); Stage 3 LogisticRegression(max_iter=100, random_state=seed) (pre-F1 code). All of this is synthetic data; it shows nothing yet about the image embeddings. Timing measures cost per evaluation only.
+- Holdout classifiers used by the CSVs above: Stage 2 LogisticRegression(max_iter=500, random_state=0); Stage 3 LogisticRegression(max_iter=500, random_state=0). All of this is synthetic data; it shows nothing yet about the image embeddings. Timing measures cost per evaluation only.

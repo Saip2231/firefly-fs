@@ -9,33 +9,32 @@ import os
 import argparse
 import numpy as np
 from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from _common import random_search as guarded_random_search
+from src.classifiers import final_clf
 from src.firefly import make_fitness, binary_firefly
 
 
 def random_search(fitness, state, d, k, budget, seed, ni):
-    """Random search evaluating valid k-sparse masks within budget."""
-    rng = np.random.default_rng(seed)
-    best_fit = np.inf
-    best_mask = None
+    """Random search via the guarded experiments/_common.random_search.
+
+    Same RNG draws, proposal order and strict-improvement rule as the old
+    local copy, so results are unchanged; the wrapper only records the
+    informative hits of every proposed mask (cache hits included).
+    """
     sample_hits = []
 
-    while state["evals"] < budget:
-        mask = np.zeros(d, dtype=bool)
-        chosen = rng.choice(d, size=k, replace=False)
-        mask[chosen] = True
+    def recording_fitness(mask):
         sample_hits.append(int(mask[:ni].sum()))
-        f = fitness(mask)
-        if f < best_fit:
-            best_fit = f
-            best_mask = mask.copy()
+        return fitness(mask)
 
+    out = guarded_random_search(recording_fitness, state, d=d, k=k,
+                                budget=budget, seed=seed)
     mean_sampled_hits = float(np.mean(sample_hits)) if sample_hits else 0.0
-    return best_mask, best_fit, mean_sampled_hits
+    return out["best_mask"], out["best_fit"], mean_sampled_hits
 
 
 def evaluate_config(d, ni=5, k=5, budget=600, seeds=(0, 1, 2, 3, 4)):
@@ -59,7 +58,7 @@ def evaluate_config(d, ni=5, k=5, budget=600, seeds=(0, 1, 2, 3, 4)):
     true_mask[:ni] = True
 
     def holdout_acc(mask):
-        clf = LogisticRegression(max_iter=500).fit(Xs[:, mask], ys)
+        clf = final_clf().fit(Xs[:, mask], ys)
         return float(clf.score(Xh[:, mask], yh))
 
     true_holdout = holdout_acc(true_mask)

@@ -8616,5 +8616,182 @@
         }
       ]
     }
+  },
+  {
+    "run_id": "20261029_122757_validate_clean_signal",
+    "timestamp": "2026-10-29T12:27:57.120657+05:30",
+    "dataset": "validate_clean_signal",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "ds": [
+        50,
+        500
+      ],
+      "n_search": [
+        1000,
+        2000
+      ],
+      "n_informative": 5,
+      "ks": [
+        5
+      ],
+      "budget": 600,
+      "n_fireflies": 20,
+      "n_total": 8000,
+      "n_holdout": 5000,
+      "class_sep": 2.0,
+      "n_clusters_per_class": 1,
+      "methods": [
+        "firefly",
+        "firefly_levy",
+        "random_search"
+      ],
+      "data_random_state": "seed",
+      "holdout_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "primary_test": {
+        "d": 500,
+        "n_search": 2000,
+        "method": "firefly",
+        "metric": "holdout_acc"
+      },
+      "multiple_testing": "holm, all tests in script"
+    },
+    "csv_paths": [
+      "results\\validate_clean_signal.csv",
+      "results\\validate_clean_signal_tests.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 219.4
+    }
+  },
+  {
+    "run_id": "20261029_123743_rescore_clean_signal",
+    "timestamp": "2026-10-29T12:37:43.886256+05:30",
+    "dataset": "rescore_clean_signal",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "source": "results/validate_clean_signal.csv",
+      "class_sep": 2.0,
+      "n_clusters_per_class": 1,
+      "n_informative": 5,
+      "threshold": 2.0,
+      "gap_rows": "non-holdout (3000)",
+      "ks": [
+        5
+      ]
+    },
+    "csv_paths": [
+      "results\\separating_columns_clean_signal.csv",
+      "results\\validate_clean_signal_rescored.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 3.3
+    }
+  },
+  {
+    "run_id": "20261029_124229_rerank_ablation",
+    "timestamp": "2026-10-29T12:42:29.167696+05:30",
+    "dataset": "rerank_ablation",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      5
+    ],
+    "params": {
+      "ds": [
+        50,
+        500
+      ],
+      "n_informative": 5,
+      "ks": [
+        5
+      ],
+      "budget": 800,
+      "n_fireflies": 20,
+      "n_total": 6000,
+      "n_search": 1000,
+      "n_holdout": 5000,
+      "max_rows": 1000,
+      "rerank_top_m": 10,
+      "n_splits": 5,
+      "class_sep": 1.0,
+      "n_clusters_per_class": 2,
+      "data_random_state": "seed"
+    },
+    "csv_paths": [
+      "results\\rerank_ablation.csv",
+      "results\\separating_columns_rerank_ablation.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 51.9
+    }
   }
 ]

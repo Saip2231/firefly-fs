@@ -34,11 +34,17 @@ No test ever touches real datasets or the filesystem.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import numpy as np
 import pytest
 from sklearn.datasets import make_classification
 
 from src.firefly import binary_firefly, make_fitness, repair
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
+from _common import random_search  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -142,17 +148,9 @@ def test_planted_features(name):
 # ---------------------------------------------------------------------------
 
 def _random_search_fitness(fitness, state, d, k, budget, seed):
-    """Baseline: evaluate random valid masks until budget exhausted."""
-    rng      = np.random.default_rng(seed)
-    best_fit = np.inf
-    while state["evals"] < budget:
-        mask = np.zeros(d, dtype=bool)
-        chosen = rng.choice(d, size=k, replace=False)
-        mask[chosen] = True
-        f = fitness(mask)
-        if f < best_fit:
-            best_fit = f
-    return best_fit
+    """Baseline: the guarded experiments/_common.random_search (same RNG draws
+    and strict-improvement rule as the old local loop, plus loop guards)."""
+    return random_search(fitness, state, d=d, k=k, budget=budget, seed=seed)["best_fit"]
 
 
 def test_firefly_not_worse_than_random():
