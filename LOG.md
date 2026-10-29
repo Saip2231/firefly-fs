@@ -115,11 +115,18 @@
 - Notes: Firefly gets only 2 sweeps at budget 300 with 20 fireflies (up to n(n-1)/2 proposals per sweep), so firefly_seeded did not improve on its seeded start; PSO's final diversity is ~0.03-0.06 (collapsed) vs Firefly ~0.53-0.66. One seed, in-sample: no comparison is claimed.
 - Committed as "day4: search registry, seeded variants, real-data sanity".
 
-## 2026-10-29 - day4 stage 4: tuning (in progress)
+## 2026-10-29 - day4 stage 4: tuning
 
 - New: experiments/tune.py (162-job one-factor grid on tuning seeds 100-102, 75/25 split of Xtr, score = final_clf on the 25 % holdout, resumable CSV, joblib loky with 1 thread per worker), experiments/tune_summary.py (decision rule, margin 0.003), tests/test_tuning.py, _common.git_hash().
 - First dry run crashed: BrokenProcessPool / AttributeError "Can't get attribute '_tuning_data' on <module '__main__'>" (run_job pickled by value from __main__, its lru_cache'd helper by reference). Fix: main() submits tune.run_job imported by module name; regression test added. No rows were written by the crashed run.
 - Dry run 2 (run 20261029_142831_tune_dryrun, results/tuning_runs_dryrun.csv): 6/6 jobs, evals 800 each, 30.7 s wall with 15 workers, mean search 17.6 s per run. tuning_acc (seed 100, default configs): digits k=16 firefly 0.8944 / pso 0.8917; cifar_r18 k=16 0.5770 / 0.6330; cifar_r18 k=64 0.7525 / 0.7405. One seed, no comparison claimed. git was 92d0964+dirty (Stage 4 files uncommitted).
 - After dry run 2: worker warnings are now returned to the parent and printed once per category for the whole grid (they were printed once per worker process).
 - Tests: pytest tests/ -q -> 116 passed before the warning change (+1 test for it).
+- Committed as "day4: tuning protocol (tune.py, tune_summary.py) + dry run" (831fd93); 117 passed.
+- Full grid: `python experiments/tune.py *> logs\tune.log`, started 14:33; 162/162 rows in results/tuning_runs.csv, all evals_used = 800, all git_hash = 831fd93 (clean). Search time per run ~21-69 s with 15 workers.
+- `python experiments/tune_summary.py` (run 20261029_144439_tune_summary; results/tuning_summary.csv, results/tuning_decision.md). Its "831fd93+dirty" is the runs.json entry tune.py had just appended.
+  - Firefly: n_fireflies=10 chosen, mean 0.7487 vs default 0.7430 (+0.0056 >= 0.003). Per condition vs default: cifar k=16 +0.0173, cifar k=64 +0.0088, digits k=16 -0.0093.
+  - PSO: w_start=1.0 chosen, mean 0.7462 vs default 0.7431. Borderline, so recomputed exactly from the CSV (holdout accuracies are multiples of 1/2000 and 1/360): mean difference = 0.0030309 >= 0.003, a genuine pass, not a rounding artefact. Per condition: cifar k=16 -0.0190, cifar k=64 +0.0022, digits k=16 +0.0259 (the gain comes from digits only).
+  - Both margins are small next to the per-condition stds (0.003-0.03, n=3 each): the decision is the output of the fixed protocol, not evidence that one setting is better. Report it that way.
+  - Consequence: population sizes now differ (Firefly 10, PSO 20). Initial populations are shared only for the first 10 members; firefly_seeded seeds 5 members, pso_seeded 10. To be settled and recorded in PREREG at Stage 6.
 

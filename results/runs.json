@@ -9217,5 +9217,264 @@
       "numpy": "2.4.6",
       "joblib": "1.6.0"
     }
+  },
+  {
+    "run_id": "20261029_144040_tune",
+    "timestamp": "2026-10-29T14:40:40.749349+05:30",
+    "dataset": "tune",
+    "kind": "experiment",
+    "n_seeds": 3,
+    "seeds": [
+      100,
+      101,
+      102
+    ],
+    "ks": [
+      16,
+      64
+    ],
+    "params": {
+      "tuning_seeds": [
+        100,
+        101,
+        102
+      ],
+      "conditions": [
+        [
+          "cifar_r18",
+          16
+        ],
+        [
+          "cifar_r18",
+          64
+        ],
+        [
+          "digits",
+          16
+        ]
+      ],
+      "ks": [
+        16,
+        64
+      ],
+      "budget": 800,
+      "holdout_frac": 0.25,
+      "configs": {
+        "firefly": {
+          "default": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "n_fireflies=10": {
+            "n_fireflies": 10,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "n_fireflies=40": {
+            "n_fireflies": 40,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "beta0=0.2": {
+            "n_fireflies": 20,
+            "beta0": 0.2,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "beta0=0.6": {
+            "n_fireflies": 20,
+            "beta0": 0.6,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "gamma=1": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 1.0,
+            "alpha": 0.02
+          },
+          "gamma=4": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 4.0,
+            "alpha": 0.02
+          },
+          "alpha=0.1": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.1
+          },
+          "alpha=0.25": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.25
+          }
+        },
+        "pso": {
+          "default": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "n_particles=10": {
+            "n_particles": 10,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "n_particles=40": {
+            "n_particles": 40,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "c1=c2=1.0": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.0,
+            "c2": 1.0,
+            "vmax": 0.5
+          },
+          "c1=c2=2.0": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 2.0,
+            "c2": 2.0,
+            "vmax": 0.5
+          },
+          "vmax=0.25": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.25
+          },
+          "vmax=1.0": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 1.0
+          },
+          "w_start=0.7": {
+            "n_particles": 20,
+            "w_start": 0.7,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "w_start=1.0": {
+            "n_particles": 20,
+            "w_start": 1.0,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          }
+        }
+      },
+      "score": "final_clf on tuning holdout (25 % of Xtr)",
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "n_jobs": 15
+    },
+    "csv_paths": [
+      "results\\tuning_runs.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 450.0,
+      "rows": 162,
+      "jobs_run": 162,
+      "git_hash": "831fd93",
+      "numpy": "2.4.6",
+      "joblib": "1.6.0"
+    }
+  },
+  {
+    "run_id": "20261029_144439_tune_summary",
+    "timestamp": "2026-10-29T14:44:39.187329+05:30",
+    "dataset": "tune_summary",
+    "kind": "experiment",
+    "n_seeds": 3,
+    "seeds": [
+      100,
+      101,
+      102
+    ],
+    "ks": [
+      16,
+      64
+    ],
+    "params": {
+      "margin": 0.003,
+      "tuning_seeds": [
+        100,
+        101,
+        102
+      ],
+      "budget": 800,
+      "ks": [
+        16,
+        64
+      ],
+      "decisions": {
+        "firefly": {
+          "best": "n_fireflies=10",
+          "chosen": "n_fireflies=10",
+          "diff": 0.005635802469135864,
+          "reason": "n_fireflies=10 beats default by 0.0056 >= 0.003",
+          "hp": {
+            "n_fireflies": 10,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.02
+          }
+        },
+        "pso": {
+          "best": "w_start=1.0",
+          "chosen": "w_start=1.0",
+          "diff": 0.003030864197531069,
+          "reason": "w_start=1.0 beats default by 0.0030 >= 0.003",
+          "hp": {
+            "n_particles": 20,
+            "w_start": 1.0,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          }
+        }
+      }
+    },
+    "csv_paths": [
+      "results\\tuning_summary.csv",
+      "results\\tuning_decision.md"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "git_hash": "831fd93+dirty"
+    }
   }
 ]
