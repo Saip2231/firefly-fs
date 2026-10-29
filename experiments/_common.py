@@ -14,6 +14,22 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
+def git_hash() -> str:
+    """Short HEAD hash, with "+dirty" if tracked files have uncommitted
+    changes; "unknown" when git is unavailable."""
+    import subprocess  # noqa: PLC0415
+
+    try:
+        h = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
+                           capture_output=True, text=True, check=True).stdout.strip()
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+                               cwd=ROOT, capture_output=True, text=True,
+                               check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
+    return h + ("+dirty" if dirty else "")
+
+
 def warn_once() -> None:
     """Print each distinct warning category once, then stay silent."""
     seen: set[str] = set()

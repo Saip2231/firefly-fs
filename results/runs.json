@@ -9031,5 +9031,191 @@
     "extra": {
       "runtime_s": 21.8
     }
+  },
+  {
+    "run_id": "20261029_142831_tune_dryrun",
+    "timestamp": "2026-10-29T14:28:31.921652+05:30",
+    "dataset": "tune_dryrun",
+    "kind": "experiment",
+    "n_seeds": 1,
+    "seeds": [
+      100
+    ],
+    "ks": [
+      16,
+      64
+    ],
+    "params": {
+      "tuning_seeds": [
+        100,
+        101,
+        102
+      ],
+      "conditions": [
+        [
+          "cifar_r18",
+          16
+        ],
+        [
+          "cifar_r18",
+          64
+        ],
+        [
+          "digits",
+          16
+        ]
+      ],
+      "ks": [
+        16,
+        64
+      ],
+      "budget": 800,
+      "holdout_frac": 0.25,
+      "configs": {
+        "firefly": {
+          "default": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "n_fireflies=10": {
+            "n_fireflies": 10,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "n_fireflies=40": {
+            "n_fireflies": 40,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "beta0=0.2": {
+            "n_fireflies": 20,
+            "beta0": 0.2,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "beta0=0.6": {
+            "n_fireflies": 20,
+            "beta0": 0.6,
+            "gamma": 2.0,
+            "alpha": 0.02
+          },
+          "gamma=1": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 1.0,
+            "alpha": 0.02
+          },
+          "gamma=4": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 4.0,
+            "alpha": 0.02
+          },
+          "alpha=0.1": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.1
+          },
+          "alpha=0.25": {
+            "n_fireflies": 20,
+            "beta0": 0.4,
+            "gamma": 2.0,
+            "alpha": 0.25
+          }
+        },
+        "pso": {
+          "default": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "n_particles=10": {
+            "n_particles": 10,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "n_particles=40": {
+            "n_particles": 40,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "c1=c2=1.0": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.0,
+            "c2": 1.0,
+            "vmax": 0.5
+          },
+          "c1=c2=2.0": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 2.0,
+            "c2": 2.0,
+            "vmax": 0.5
+          },
+          "vmax=0.25": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.25
+          },
+          "vmax=1.0": {
+            "n_particles": 20,
+            "w_start": 0.9,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 1.0
+          },
+          "w_start=0.7": {
+            "n_particles": 20,
+            "w_start": 0.7,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          },
+          "w_start=1.0": {
+            "n_particles": 20,
+            "w_start": 1.0,
+            "c1": 1.5,
+            "c2": 1.5,
+            "vmax": 0.5
+          }
+        }
+      },
+      "score": "final_clf on tuning holdout (25 % of Xtr)",
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "n_jobs": 15
+    },
+    "csv_paths": [
+      "results\\tuning_runs_dryrun.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)"
+    },
+    "extra": {
+      "runtime_s": 30.7,
+      "rows": 6,
+      "jobs_run": 6,
+      "git_hash": "92d0964+dirty",
+      "numpy": "2.4.6",
+      "joblib": "1.6.0"
+    }
   }
 ]

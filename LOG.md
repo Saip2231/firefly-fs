@@ -113,4 +113,13 @@
 - Tests: tests/test_registry.py 12 passed; pytest tests/ -q -> 106 passed.
 - `python experiments/sanity_real.py` (run 20261029_140724_sanity_real, results/sanity_real.csv): digits, data seed 0, k=16, budget 300, default hp, validation fitness only (no test accuracy). ANOVA top-k (inner-train) 0.0658. init -> final: firefly 0.1400 -> 0.0987 (2 sweeps), firefly_levy 0.1400 -> 0.0823 (2), pso 0.1400 -> 0.0603 (33 iters), firefly_seeded 0.0658 -> 0.0658 (2), pso_seeded 0.0658 -> 0.0520 (63). All 300 evals used; seeded methods start at the ANOVA mask (assert OK). Warnings: the known digits constant columns [0 24 32 39] in f_classif.
 - Notes: Firefly gets only 2 sweeps at budget 300 with 20 fireflies (up to n(n-1)/2 proposals per sweep), so firefly_seeded did not improve on its seeded start; PSO's final diversity is ~0.03-0.06 (collapsed) vs Firefly ~0.53-0.66. One seed, in-sample: no comparison is claimed.
+- Committed as "day4: search registry, seeded variants, real-data sanity".
+
+## 2026-10-29 - day4 stage 4: tuning (in progress)
+
+- New: experiments/tune.py (162-job one-factor grid on tuning seeds 100-102, 75/25 split of Xtr, score = final_clf on the 25 % holdout, resumable CSV, joblib loky with 1 thread per worker), experiments/tune_summary.py (decision rule, margin 0.003), tests/test_tuning.py, _common.git_hash().
+- First dry run crashed: BrokenProcessPool / AttributeError "Can't get attribute '_tuning_data' on <module '__main__'>" (run_job pickled by value from __main__, its lru_cache'd helper by reference). Fix: main() submits tune.run_job imported by module name; regression test added. No rows were written by the crashed run.
+- Dry run 2 (run 20261029_142831_tune_dryrun, results/tuning_runs_dryrun.csv): 6/6 jobs, evals 800 each, 30.7 s wall with 15 workers, mean search 17.6 s per run. tuning_acc (seed 100, default configs): digits k=16 firefly 0.8944 / pso 0.8917; cifar_r18 k=16 0.5770 / 0.6330; cifar_r18 k=64 0.7525 / 0.7405. One seed, no comparison claimed. git was 92d0964+dirty (Stage 4 files uncommitted).
+- After dry run 2: worker warnings are now returned to the parent and printed once per category for the whole grid (they were printed once per worker process).
+- Tests: pytest tests/ -q -> 116 passed before the warning change (+1 test for it).
 

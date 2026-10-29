@@ -1,0 +1,7 @@
+method,config_id,config_json,dataset,k,seed,tuning_acc,val_fitness,evals_used,search_s,git_hash
+pso,default,"{""c1"": 1.5, ""c2"": 1.5, ""n_particles"": 20, ""vmax"": 0.5, ""w_start"": 0.9}",digits,16,100,0.8916666666666667,0.04283333333333334,800,12.099,92d0964+dirty
+firefly,default,"{""alpha"": 0.02, ""beta0"": 0.4, ""gamma"": 2.0, ""n_fireflies"": 20}",digits,16,100,0.8944444444444445,0.06483333333333337,800,12.208,92d0964+dirty
+firefly,default,"{""alpha"": 0.02, ""beta0"": 0.4, ""gamma"": 2.0, ""n_fireflies"": 20}",cifar_r18,16,100,0.577,0.3745325,800,13.005,92d0964+dirty
+pso,default,"{""c1"": 1.5, ""c2"": 1.5, ""n_particles"": 20, ""vmax"": 0.5, ""w_start"": 0.9}",cifar_r18,16,100,0.633,0.32503249999999995,800,13.899,92d0964+dirty
+firefly,default,"{""alpha"": 0.02, ""beta0"": 0.4, ""gamma"": 2.0, ""n_fireflies"": 20}",cifar_r18,64,100,0.7525,0.25073,800,26.974,92d0964+dirty
+pso,default,"{""c1"": 1.5, ""c2"": 1.5, ""n_particles"": 20, ""vmax"": 0.5, ""w_start"": 0.9}",cifar_r18,64,100,0.7405,0.21310999999999997,800,27.168,92d0964+dirty
