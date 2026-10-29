@@ -89,15 +89,32 @@ def random_search(fitness, state, d: int, k: int, budget: int, seed: int,
 
     Picks by the same validation fitness as Firefly.  Returns a dict with
     best_mask, best_fit, best_init (best of the first `init_n` draws, the
-    counterpart of Firefly's initial swarm), proposals, improvements.
+    counterpart of Firefly's initial swarm), proposals, improvements,
+    evals_used, stopped ("budget", "max_proposals" or "cache_hits").
+
+    Loop guards (F4): stop after 100*budget proposals, or after 5*budget
+    consecutive cache hits (e.g. budget > C(d, k) distinct masks).  Neither
+    guard can trigger before the budget is spent unless new masks become
+    rare, so normal runs are unchanged.
     """
+    if budget < 1:
+        raise ValueError(f"budget must be >= 1, got {budget}")
     rng = np.random.default_rng(seed)
     best_fit, best_mask, best_init = np.inf, None, np.inf
-    proposals = improvements = 0
+    proposals = improvements = consecutive_hits = 0
+    stopped = "budget"
     while state["evals"] < budget:
+        if proposals >= 100 * budget:
+            stopped = "max_proposals"
+            break
+        if consecutive_hits >= 5 * budget:
+            stopped = "cache_hits"
+            break
         mask = np.zeros(d, dtype=bool)
         mask[rng.choice(d, size=k, replace=False)] = True
+        before = state["evals"]
         f = fitness(mask)
+        consecutive_hits = consecutive_hits + 1 if state["evals"] == before else 0
         proposals += 1
         if f < best_fit:
             best_fit, best_mask = f, mask.copy()
@@ -108,4 +125,5 @@ def random_search(fitness, state, d: int, k: int, budget: int, seed: int,
         best_init = best_fit
     return dict(best_mask=best_mask, best_fit=float(best_fit),
                 best_init=float(best_init), proposals=proposals,
-                improvements=improvements)
+                improvements=improvements, evals_used=int(state["evals"]),
+                stopped=stopped)

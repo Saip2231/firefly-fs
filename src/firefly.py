@@ -49,6 +49,9 @@ binary_firefly  (v2 — three targeted fixes)
         which is tiny on CIFAR (2*16/512 = 0.0625) and gamma has no effect.
         Dividing by 2k instead gives r in [0,1] for any k and d, and gamma
         becomes a scale-invariant absorption coefficient.
+        Correction (F4): the exact maximum is 2*min(k, d-k), which equals 2k
+        only for k <= d/2; the code now divides by 2*min(k, d-k) (identical
+        for every Day-3 run) and raises ValueError for k >= d.
 
     FIX 3 — Lower default beta0=0.4.
         beta0=0.9 copies ~90% of differing bits, collapsing diversity in
@@ -63,7 +66,7 @@ binary_firefly  (v2 — three targeted fixes)
     the budget keeps being used.  Runs that never stalled are unchanged.
 
     Diversity logging: state["diversity"] is a list of mean pairwise
-    Hamming distances (normalised by 2k) recorded after each sweep so that
+    Hamming distances (normalised by 2*min(k, d-k)) recorded after each sweep so that
     population collapse is visible.
 """
 
@@ -268,8 +271,9 @@ def binary_firefly(
     n_fireflies : Swarm size.
     beta0       : Base attraction strength [0, 1].  Default 0.4 (was 0.9);
                   lower value preserves swarm diversity.
-    gamma       : Light absorption coefficient.  Acts on r = Hamming/2k,
-                  which is now in [0, 1] for any k and d.
+    gamma       : Light absorption coefficient.  Acts on
+                  r = Hamming / (2*min(k, d-k)), which is in [0, 1].
+    budget, k   : ValueError unless budget >= 1 and 1 <= k < d.
     alpha       : Controls mutation magnitude.  Expected swaps per move =
                   max(1, round(alpha * k)).  Scale-invariant w.r.t. d.
     levy        : If True, 10% of moves use 3x the normal swap count.
@@ -292,7 +296,7 @@ def binary_firefly(
           cache_hits      -- proposals whose fitness() was a cache hit
           accepted_moves  -- proposals whose candidate was accepted by firefly i
           new_evals       -- new (uncached) classifier fits in this sweep
-          diversity       -- mean pairwise Hamming/2k after the sweep
+          diversity       -- mean pairwise Hamming/(2*min(k, d-k)) after the sweep
           brightest_changed -- True if the global best mask changed this sweep
           stall_proposals -- tie-stall swap proposals in this sweep (also
                              counted in proposals / cache_hits / accepted_moves)
@@ -310,9 +314,16 @@ def binary_firefly(
     Side-effects on *state*
     -----------------------
     state["evals"]        : int  -- cumulative new fitness evaluations.
-    state["diversity"]    : list[float] -- mean pairwise Hamming/2k per sweep.
+    state["diversity"]    : list[float] -- mean pairwise Hamming / (2*min(k, d-k))
+                            per sweep.
     state["stall_sweeps"] : int  -- sweeps that used the tie-stall fallback.
     """
+    if budget < 1:
+        raise ValueError(f"budget must be >= 1, got {budget}")
+    if not 1 <= k < d:
+        raise ValueError(f"need 1 <= k < d, got k={k}, d={d} "
+                         "(k >= d leaves nothing to select)")
+
     rng = np.random.default_rng(seed)
 
     # -- Initialise swarm: n_fireflies random masks each with exactly k True -
@@ -336,7 +347,9 @@ def binary_firefly(
     state.setdefault("diversity", [])
     max_sweeps = budget          # hard cap: cannot spin more times than budget
     alpha_cur  = alpha
-    max_hamming = 2 * k          # FIX 2: max possible Hamming between two k-subsets
+    # FIX 2 / F4: max possible Hamming distance between two k-subsets of d
+    # items is 2*min(k, d-k) (equal to 2k whenever k <= d/2).
+    max_hamming = 2 * min(k, d - k)
     _n_stall_sweeps = 0          # F3: sweeps that fell back to tie-stall swaps
 
     # Initialise trace container (no-op when trace is None).
@@ -376,7 +389,7 @@ def binary_firefly(
                 proposed_any = True
 
                 # -- Attraction move -----------------------------------------
-                # FIX 2: normalise Hamming by 2k so r is in [0, 1] for any
+                # FIX 2 / F4: normalise Hamming by 2*min(k, d-k) so r is in [0, 1] for any
                 # k-subset pair, making gamma scale-invariant across datasets.
                 raw_hamming = float(np.sum(positions[i] != positions[j]))
                 r    = raw_hamming / max_hamming
@@ -483,7 +496,7 @@ def binary_firefly(
         # best_fit is only ever updated downward, so history is non-increasing.
         history.append(best_fit)
 
-        # -- Diversity: mean pairwise Hamming distance (normalised by 2k) ----
+        # -- Diversity: mean pairwise Hamming / (2*min(k, d-k)) --------------
         if n_fireflies > 1:
             total_hamming = 0.0
             n_pairs = 0
