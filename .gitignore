@@ -5,3 +5,6 @@ __pycache__/
 data/
 results/golden_day3_compare.json
 logs/
+# local AI-assistant / editor tool folders (not project files)
+.claude/
+.agents/
