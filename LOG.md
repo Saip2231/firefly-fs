@@ -30,3 +30,34 @@
 | time_fitness | 20261029_000149_time_fitness | [0] | 55.8 |
 
 - Summary: results/day3_summary.md
+
+## 2026-10-29 - day3-fixes: shared clf, budget accounting, tie-stall, guards, docs
+
+- Why: adversarial review of Day 3 (read-only session) before Day 4. Findings and their status are in the table below.
+- Git: branch `master`, parent commit `fb8ed820a930052312a07c91a74869b3a8e362a2` (F5). This entry is part of the commit "day3-fixes: shared clf, budget accounting, tie-stall, guards, docs" (a commit cannot record its own hash; see `git log`). Stage commits since `c73b218` (day3):
+  - `bbbcab3` day3-fixes: golden outputs (F0; the F1 shared-classifier changes were committed in this same commit)
+  - `35e45b1` day3-fixes: budget accounting and rerank fairness (F2)
+  - `79096a0` day3-fixes: tie-stall fallback in binary_firefly (approved) (F3)
+  - `c57660b` day3-fixes: loop guards, budget/k validation, 2*min(k,d-k) normalisation (F4)
+  - `fb8ed82` day3-fixes: claims and docs (swap docstring, primary test, Holm) (F5)
+- Environment: same venv as the day3 entry (Python 3.11.4, numpy 2.4.6, scikit-learn 1.9.1); not re-printed in this session.
+- Tests: pytest tests/ -q -> 53 passed (was 33). New suites: test_classifiers, test_tie_stall, test_guards, test_stats_helpers; new tests in test_rerank; test_firefly_beats_random renamed test_firefly_not_worse_than_random (threshold unchanged).
+- Regression: `python experiments/golden_day3.py --compare` -> 33/33 runs identical to results/golden_day3.json (masks, best_fit, history, evals_used, sweeps) after F1, F2, F3, F4 and F5. No golden run stalled (0 stopped before budget), so the F3 tie-stall fallback changed no recorded run.
+- Commands run (from firefly-fs/, venv active): `python experiments/golden_day3.py` (F0), then after every stage `pytest tests/ -q` and `python experiments/golden_day3.py --compare`; F5: `python experiments/make_day3_report.py --no-log` (regenerated results/day3_summary.md from the existing Day-3 CSVs).
+- Not rerun: diagnose_d500.py and validate_clean_signal.py (rule: rerun only if golden outputs changed; they did not).
+- Open: the holdout accuracies in validate_clean_signal.csv, validate_clean_signal_rescored.csv and rerank_ablation.csv were computed with the pre-F1 holdout classifier LogisticRegression(max_iter=100, random_state=seed); day3_summary.md states this. Rerunning validate_clean_signal -> rescore_clean_signal -> rerank_ablation would put them on final_clf() (max_iter=500) and add sep_hits / total_fits columns to the CSVs. Baseline CSVs already used max_iter=500 and are unaffected.
+- Day-3 results under the F5 reporting rules: primary test (holdout_acc, firefly vs random search, d=500, 2000 search rows) higher, mean diff +0.0145, p=0.0371, Holm-adjusted p=0.9062, n=10; 0 of 32 Stage-2 tests have Holm-adjusted p < 0.05.
+
+| # | finding (Day-3 review) | sev | status | stage |
+|---|---|---|---|---|
+| 1 | rerank fits uncounted in budget, use more rows | MAJOR | fixed: evals_used / rerank_fits / total_fits / rerank_s reported; rerank only compared within the same search | F2 |
+| 2 | "beats random" judged on in-sample val fitness, no correction | MAJOR | fixed: primary test on holdout_acc named, Holm over 32 tests, no "BEATS" label | F5 |
+| 3 | alpha has no effect at small k; swap docstring wrong | MAJOR | docs fixed (max_swaps=1 for k<=74 at alpha=0.02; mean (1+max)/2); behaviour unchanged by design | F5 |
+| 4 | random_search can loop forever | MAJOR | fixed in experiments/_common.py (100*budget proposals / 5*budget consecutive cache hits); toy_check.py and the test helper in test_firefly.py still unguarded | F4 |
+| 5 | tie-stall stops search with budget unspent | MAJOR | fixed: one random swap per firefly on a stall (approved change); golden unchanged | F3 |
+| 6 | final classifier differs across methods | MAJOR | fixed: src/classifiers.final_clf() everywhere + AST test; Day-3 holdout CSVs still pre-F1 (open, above) | F1 |
+| 7 | rerank CV includes selecting rows | MINOR | documented in rerank docstring (selection bias, not test leakage) | F2 |
+| 8 | 2k normaliser wrong for k > d/2; k >= d | MINOR | fixed: 2*min(k, d-k); ValueError unless 1 <= k < d | F4 |
+| 9 | test_firefly_beats_random overclaims | MINOR | fixed: renamed, no-claim docstring, threshold unchanged | F5 |
+| 10 | budget=0 returns unevaluated mask | MINOR | fixed: ValueError for budget < 1 (firefly, random_search) | F4 |
+| 11 | BLAS thread effects on ties | MINOR | unchanged; golden_day3.py pins thread env vars; CLAUDE.md rule 12 covers parallel jobs | - |
