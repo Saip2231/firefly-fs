@@ -9476,5 +9476,88 @@
     "extra": {
       "git_hash": "831fd93+dirty"
     }
+  },
+  {
+    "run_id": "20261029_224521_meta_digits_smoke",
+    "timestamp": "2026-10-29T22:45:21.498238+05:30",
+    "dataset": "meta_digits_smoke",
+    "kind": "experiment",
+    "n_seeds": 2,
+    "seeds": [
+      0,
+      1
+    ],
+    "ks": [
+      16,
+      32
+    ],
+    "params": {
+      "dataset": "digits",
+      "methods": [
+        "firefly",
+        "pso",
+        "firefly_seeded",
+        "pso_seeded"
+      ],
+      "budgets": [
+        150
+      ],
+      "ks": [
+        16,
+        32
+      ],
+      "skipped_ks": [
+        64
+      ],
+      "config_file": "smoke_config.yaml",
+      "config_hash": "f8d5d28b57ab64aac0876d52f08ac7cde9ef92b32fc3ac12f6974769c4b1b562",
+      "config": {
+        "_comment": "SMOKE TEST ONLY (Day 4 Stage 5). Default hyperparameters, NOT the tuned values; the real runs use config/frozen_config.yaml (Stage 6). Written in JSON flow style, which is valid YAML and loads without PyYAML.",
+        "firefly": {
+          "n_fireflies": 20,
+          "beta0": 0.4,
+          "gamma": 2.0,
+          "alpha": 0.02
+        },
+        "pso": {
+          "n_particles": 20,
+          "w_start": 0.9,
+          "c1": 1.5,
+          "c2": 1.5,
+          "vmax": 0.5
+        },
+        "frac_seeded": 0.5,
+        "top_m": 10,
+        "n_splits": 5
+      },
+      "force": false,
+      "n_jobs": 15,
+      "classifiers": {
+        "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+        "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+        "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+        "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+      }
+    },
+    "csv_paths": [
+      "results\\smoke\\meta_digits.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "run_id": "20261029_224452_meta_digits",
+      "git_hash": "b006f11+dirty",
+      "jobs_run": 16,
+      "rows_total": 32,
+      "runtime_s": 29.3
+    }
   }
 ]

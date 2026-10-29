@@ -1,0 +1,8 @@
+{
+  "_comment": "SMOKE TEST ONLY (Day 4 Stage 5). Default hyperparameters, NOT the tuned values; the real runs use config/frozen_config.yaml (Stage 6). Written in JSON flow style, which is valid YAML and loads without PyYAML.",
+  "firefly": {"n_fireflies": 20, "beta0": 0.4, "gamma": 2.0, "alpha": 0.02},
+  "pso": {"n_particles": 20, "w_start": 0.9, "c1": 1.5, "c2": 1.5, "vmax": 0.5},
+  "frac_seeded": 0.5,
+  "top_m": 10,
+  "n_splits": 5
+}

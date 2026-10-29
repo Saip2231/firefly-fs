@@ -129,4 +129,13 @@
   - PSO: w_start=1.0 chosen, mean 0.7462 vs default 0.7431. Borderline, so recomputed exactly from the CSV (holdout accuracies are multiples of 1/2000 and 1/360): mean difference = 0.0030309 >= 0.003, a genuine pass, not a rounding artefact. Per condition: cifar k=16 -0.0190, cifar k=64 +0.0022, digits k=16 +0.0259 (the gain comes from digits only).
   - Both margins are small next to the per-condition stds (0.003-0.03, n=3 each): the decision is the output of the fixed protocol, not evidence that one setting is better. Report it that way.
   - Consequence: population sizes now differ (Firefly 10, PSO 20). Initial populations are shared only for the first 10 members; firefly_seeded seeds 5 members, pso_seeded 10. To be settled and recorded in PREREG at Stage 6.
+- Committed as "day4: tuning grid results and decision".
+
+## 2026-10-29 - day4 stage 5: resumable runner
+
+- New: experiments/run_metaheuristics.py (thread env vars forced to 1 before numpy; job key (dataset, method, budget, seed, k); main process appends + fsyncs rows per finished job; --force moves old rows to meta_<dataset>_replaced.csv; test split used only in evaluate_on_test), config/smoke_config.yaml (default hp, smoke only, JSON-flow YAML because PyYAML is not installed), tests/test_runner.py; src/classifiers.py gains knn_clf() (k=5) and svm_clf() (LinearSVC, max_iter=5000, random_state=0); logs/ added to .gitignore.
+- Decision: digits k=64 (= d) is skipped automatically by the runner (Stage 0 open item).
+- Smoke: `python experiments/run_metaheuristics.py --smoke` (run 20261029_224452_meta_digits, results/smoke/meta_digits.csv): 16 jobs, 32 rows, 29.3 s with 15 workers, every job evals = 150, rerank 1.7-3.2 s. git was b006f11+dirty (Stage 5 files uncommitted; the Day 5 runs must start from a clean commit).
+- Tests: tests/test_runner.py 6 passed (84.7 s, runs the smoke grid itself); pytest tests/ -q -> 123 passed in 252 s (was 69 s before the runner tests).
+- Closes review MAJOR 2 for the runner (thread limits).
 

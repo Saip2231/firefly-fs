@@ -4,3 +4,4 @@ __pycache__/
 *.pyo
 data/
 results/golden_day3_compare.json
+logs/
