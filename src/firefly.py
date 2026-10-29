@@ -58,6 +58,10 @@ binary_firefly  (v2 — three targeted fixes)
     Budget enforcement: the budget guard is placed BEFORE each fitness call
     so that state["evals"] can never exceed the requested budget.
 
+    Tie-stall (day3-fixes F3, approved): a sweep with no attraction proposal
+    no longer ends the search; each firefly gets one random swap instead, so
+    the budget keeps being used.  Runs that never stalled are unchanged.
+
     Diversity logging: state["diversity"] is a list of mean pairwise
     Hamming distances (normalised by 2k) recorded after each sweep so that
     population collapse is visible.
@@ -290,12 +294,24 @@ def binary_firefly(
           new_evals       -- new (uncached) classifier fits in this sweep
           diversity       -- mean pairwise Hamming/2k after the sweep
           brightest_changed -- True if the global best mask changed this sweep
+          stall_proposals -- tie-stall swap proposals in this sweep (also
+                             counted in proposals / cache_hits / accepted_moves)
         When ``trace=None`` (the default) behaviour is byte-for-byte unchanged.
+
+    Tie-stall (F3, approved change)
+    -------------------------------
+    If a sweep makes no attraction proposal (no firefly strictly brighter than
+    another, i.e. all fitness values tie), each firefly gets one random swap
+    with greedy acceptance instead of the search stopping.  The budget is
+    checked before every fitness call; the loop ends when the budget is spent
+    or after max_sweeps = budget sweeps (hard cap, reached only when swaps
+    keep hitting the cache).
 
     Side-effects on *state*
     -----------------------
-    state["evals"]     : int  -- cumulative new fitness evaluations.
-    state["diversity"] : list[float] -- mean pairwise Hamming/2k per sweep.
+    state["evals"]        : int  -- cumulative new fitness evaluations.
+    state["diversity"]    : list[float] -- mean pairwise Hamming/2k per sweep.
+    state["stall_sweeps"] : int  -- sweeps that used the tie-stall fallback.
     """
     rng = np.random.default_rng(seed)
 
@@ -321,6 +337,7 @@ def binary_firefly(
     max_sweeps = budget          # hard cap: cannot spin more times than budget
     alpha_cur  = alpha
     max_hamming = 2 * k          # FIX 2: max possible Hamming between two k-subsets
+    _n_stall_sweeps = 0          # F3: sweeps that fell back to tie-stall swaps
 
     # Initialise trace container (no-op when trace is None).
     # init_best / init_evals describe the swarm BEFORE the first sweep
@@ -341,8 +358,9 @@ def binary_firefly(
         _sw_accepted = 0
         _sw_new_evals_start = state["evals"]
         _sw_brightest_changed = False
+        _sw_stall = 0
 
-        moved_any = False
+        proposed_any = False
 
         for i in range(n_fireflies):
             for j in range(n_fireflies):
@@ -355,7 +373,7 @@ def binary_firefly(
                     continue
 
                 _sw_proposals += 1
-                moved_any = True
+                proposed_any = True
 
                 # -- Attraction move -----------------------------------------
                 # FIX 2: normalise Hamming by 2k so r is in [0, 1] for any
@@ -423,6 +441,44 @@ def binary_firefly(
             if state["evals"] >= budget:
                 break
 
+        # -- F3 (approved): tie-stall ----------------------------------------
+        # No firefly is strictly brighter than another, so the attraction
+        # loop proposed nothing.  Previously the search stopped here with
+        # budget unspent.  Instead, give each firefly one random swap
+        # (drop one selected, add one unselected; stays exactly k) with the
+        # same greedy acceptance.  Budget is checked BEFORE each fitness
+        # call; the hard sweep cap still bounds the loop when every swap is a
+        # cache hit.  Runs without a stall consume no extra RNG draws, so
+        # their outputs are unchanged.
+        if not proposed_any:
+            _n_stall_sweeps += 1
+            for i in range(n_fireflies):
+                if state["evals"] >= budget:
+                    break
+                on_c  = np.where(positions[i])[0]
+                off_c = np.where(~positions[i])[0]
+                if len(on_c) == 0 or len(off_c) == 0:
+                    continue
+                candidate = positions[i].copy()
+                candidate[rng.choice(on_c)]  = False
+                candidate[rng.choice(off_c)] = True
+
+                _sw_proposals += 1
+                _sw_stall += 1
+                _evals_before = state["evals"]
+                new_fit = fitness(candidate)
+                if state["evals"] == _evals_before:
+                    _sw_cache_hits += 1
+
+                if new_fit <= fits[i]:
+                    positions[i] = candidate
+                    fits[i]      = new_fit
+                    _sw_accepted += 1
+                    if new_fit < best_fit:
+                        best_fit  = new_fit
+                        best_mask = candidate.copy()
+                        _sw_brightest_changed = True
+
         # Record best fitness after this sweep.
         # best_fit is only ever updated downward, so history is non-increasing.
         history.append(best_fit)
@@ -450,14 +506,16 @@ def binary_firefly(
                 "new_evals":         state["evals"] - _sw_new_evals_start,
                 "diversity":         mean_div,
                 "brightest_changed": _sw_brightest_changed,
+                "stall_proposals":   _sw_stall,
             })
 
         # Geometric alpha decay: reduce exploration over time
         alpha_cur *= 0.98
 
-        # Early termination: if no firefly moved, the swarm has converged
-        if not moved_any:
-            break
+        # (No early termination on a tie-stall any more: see F3 block above.
+        # The loop ends when the budget is spent or max_sweeps is reached.)
+
+    state["stall_sweeps"] = state.get("stall_sweeps", 0) + _n_stall_sweeps
 
     return best_mask, best_fit, history
 

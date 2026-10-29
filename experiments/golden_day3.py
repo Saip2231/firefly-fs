@@ -78,6 +78,9 @@ def run_one(method, X, y, k, budget, seed, fit_kw):
         "history": [float(h) for h in history],
         "evals_used": int(state["evals"]),
         "n_sweeps": len(history),
+        # not compared (absent from the F0 golden file); > 0 marks a run where
+        # the F3 tie-stall fallback actually fired
+        "stall_sweeps": int(state.get("stall_sweeps", 0)),
     }
 
 
@@ -92,6 +95,8 @@ def run_all():
                 runs[key] = dict(case=case, method=method, seed=seed, d=X.shape[1],
                                  k=k, budget=budget, **r)
                 flag = "  EARLY STOP" if r["evals_used"] < budget else ""
+                if r["stall_sweeps"]:
+                    flag += f"  STALL x{r['stall_sweeps']}"
                 print(f"{key:<36} best_fit={r['best_fit']:.6f} evals={r['evals_used']:>4} "
                       f"sweeps={r['n_sweeps']:>3}{flag}", flush=True)
     return runs
