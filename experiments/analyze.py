@@ -1,0 +1,36 @@
+"""Analysis orchestrator (ANALYSIS.md).  Reads result CSVs only.
+
+    python -m experiments.analyze              # every stage implemented so far
+    python -m experiments.analyze --only A0    # one stage
+
+Stages live in experiments/analysis/a<n>_*.py, each with run().  A0 must
+pass before any later stage runs.  Stages are added here as they are built;
+the manifest (A9) comes last.
+"""
+
+from __future__ import annotations
+
+import argparse
+
+from experiments.analysis import a0_integrity
+from experiments.analysis.takeaway import integrity_sentence
+
+STAGES = {
+    "A0": a0_integrity.run,
+}
+
+
+def main(argv=None) -> None:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--only", choices=sorted(STAGES), default=None)
+    args = ap.parse_args(argv)
+    todo = [args.only] if args.only else list(STAGES)
+    for name in todo:
+        print(f"===== {name} =====")
+        out = STAGES[name]()
+        if name == "A0":
+            print(integrity_sentence(out))
+
+
+if __name__ == "__main__":
+    main()

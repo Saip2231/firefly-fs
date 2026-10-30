@@ -171,3 +171,11 @@
 - git_hash on the rows: digits `dd8c6dc`; both CIFAR runs `dd8c6dc+dirty`. Cause checked with `git status --short` during run 2: the only modified tracked file was results/runs.json (run 1's log_experiment append); results/meta_*.csv were untracked. Same code as dd8c6dc. Follow-up after Day 5: git_hash() should ignore changes under results/.
 - Backups of meta_digits.csv and meta_cifar_r18.csv (after run 2) in ../backup_day5/ (outside the repo).
 
+## 2026-10-30 - analysis A0: loader, integrity checks, style
+
+- New: experiments/analysis/{__init__,common,a0_integrity,style,takeaway}.py, experiments/analyze.py (`--only A0`), tests/test_analysis_a0.py (21 tests: one deliberately broken frame per check, real results must pass).
+- `python -m experiments.analyze --only A0` -> results/analysis/integrity_report.md: ALL CHECKS PASSED. Rows: baselines digits 190, cifar_r18 250; meta digits 320, cifar_r18 640. 140 groups with seeds 0-9 exactly once; no NaN accuracies; evals_used = budget on all 960 meta rows; idx length = k on 1310 rows (PCA and all excluded); single config_hash b14f6b19...; budgets {800, 3000}; seeds match; split hashes for seeds 0-9; 12 families = PREREG. git: digits dd8c6dc, cifar_r18 dd8c6dc+dirty (runs.json append, explained in the Day-5 entry).
+- Tests: tests/test_analysis_a0.py 20 passed, 1 skipped (save_fig, matplotlib not installed); pytest tests/ -q -> 155 passed, 1 skipped.
+- After the run: seeds in the seeds_match / split_hashes details now print as plain ints (numpy 2 printed np.int64(...)); report text only.
+- Dependencies approved: matplotlib and statsmodels added to requirements.txt (lower bounds; record the installed versions here).
+
