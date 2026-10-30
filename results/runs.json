@@ -9940,5 +9940,237 @@
       "rows_total": 640,
       "runtime_s": 3167.4
     }
+  },
+  {
+    "run_id": "20261030_224915_time_final",
+    "timestamp": "2026-10-30T22:49:15.990632+05:30",
+    "dataset": "time_final",
+    "kind": "experiment",
+    "n_seeds": 5,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "ks": [],
+    "params": {
+      "seed": 0,
+      "warmup": 50,
+      "repeats": 1000,
+      "rows": "training",
+      "classifiers": {
+        "lr": "LogisticRegression(max_iter=500, random_state=0)",
+        "knn": "KNeighborsClassifier(n_neighbors=5)"
+      },
+      "contention_jobs": [
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          0
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          1
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          2
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          3
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          4
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          0
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          1
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          2
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          3
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          4
+        ]
+      ],
+      "skip_contention": false
+    },
+    "csv_paths": [
+      "results\\analysis\\timing_idle.csv",
+      "results\\analysis\\contention.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "runtime_s": 288.6,
+      "contention": "contention_factor = 2.95 (mean logged search_s under 15-way load / mean idle sequential search_s, 10 jobs); idx matches logged idx in 10/10 jobs",
+      "git_hash": "ce4561f"
+    }
+  },
+  {
+    "run_id": "20261030_230338_time_final",
+    "timestamp": "2026-10-30T23:03:38.019469+05:30",
+    "dataset": "time_final",
+    "kind": "experiment",
+    "n_seeds": 1,
+    "seeds": [
+      0
+    ],
+    "ks": [],
+    "params": {
+      "seed": 0,
+      "warmup": 50,
+      "repeats": 1000,
+      "ref_repeats": 100,
+      "burn_in_s": 20.0,
+      "rows": "training",
+      "classifiers": {
+        "lr": "LogisticRegression(max_iter=500, random_state=0)",
+        "knn": "KNeighborsClassifier(n_neighbors=5)"
+      },
+      "contention_jobs": [
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          0
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          1
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          2
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          3
+        ],
+        [
+          "cifar_r18",
+          "firefly",
+          16,
+          800,
+          4
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          0
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          1
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          2
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          3
+        ],
+        [
+          "cifar_r18",
+          "pso",
+          16,
+          800,
+          4
+        ]
+      ],
+      "skip_contention": true
+    },
+    "csv_paths": [
+      "results\\analysis\\timing_idle.csv",
+      "results\\analysis\\contention.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "runtime_s": 228.0,
+      "contention": "contention check skipped",
+      "git_hash": "ce4561f+dirty"
+    }
   }
 ]
