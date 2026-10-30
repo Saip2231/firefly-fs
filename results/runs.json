@@ -10172,5 +10172,80 @@
       "contention": "contention check skipped",
       "git_hash": "ce4561f+dirty"
     }
+  },
+  {
+    "run_id": "20261030_233155_eval_baseline_transfer",
+    "timestamp": "2026-10-30T23:31:55.940383+05:30",
+    "dataset": "eval_baseline_transfer",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "params": {
+      "datasets": [
+        "digits",
+        "cifar_r18"
+      ],
+      "evaluation": "run_metaheuristics.evaluate_on_test",
+      "classifiers": {
+        "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+        "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+        "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+        "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+      },
+      "n_jobs": 15,
+      "ks": [
+        16,
+        32,
+        64,
+        128
+      ]
+    },
+    "csv_paths": [
+      "results\\baselines_transfer_digits.csv",
+      "results\\baselines_transfer_cifar_r18.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "runtime_s": 66.9,
+      "summary": {
+        "digits": {
+          "rows": 100,
+          "lr_matches": 100,
+          "warnings": []
+        },
+        "cifar_r18": {
+          "rows": 200,
+          "lr_matches": 200,
+          "warnings": []
+        }
+      },
+      "git_hash": "e0d465b"
+    }
   }
 ]

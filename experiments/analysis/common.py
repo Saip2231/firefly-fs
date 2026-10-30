@@ -115,6 +115,18 @@ def load_meta(dataset: str, path: Path | None = None) -> pd.DataFrame:
     return tidy_meta(_read(path or RESULTS / f"meta_{dataset}.csv"))
 
 
+def load_baseline_transfer(dataset: str, path: Path | None = None) -> pd.DataFrame:
+    """results/baselines_transfer_<dataset>.csv (Stage A6a; canonical method
+    names, acc_lr / acc_knn / acc_svm per baseline subset), idx parsed."""
+    df = _read(path or RESULTS / f"baselines_transfer_{dataset}.csv")
+    unknown = sorted(set(df.method) - set(BASELINE_LABELS.values()))
+    if unknown:
+        raise ValueError(f"unknown method(s) {unknown} in baselines_transfer_{dataset}.csv")
+    out = df.copy()
+    out["idx"] = out["idx"].map(parse_idx)
+    return out
+
+
 def load_split_hashes(path: Path | None = None) -> pd.DataFrame:
     return pd.read_csv(path or RESULTS / "split_hashes.csv")
 

@@ -220,3 +220,10 @@
 - Sanity: random empirical vs analytic Jaccard agree (ratio 0.87-1.16; cifar_r18 k=128 0.144 vs 0.143; digits k=32 0.336 vs 0.333), so idx parsing and the computation are consistent.
 - Results (raw masks, cifar_r18): ANOVA 0.92-0.98, MI 0.81-0.91, RF 0.71-0.84, L1 0.26-0.41; Firefly 0.05-0.16 and PSO 0.035-0.145 (random 0.014-0.144); seeded variants 0.07-0.27. Digits: Firefly 0.33-0.42 vs random 0.14-0.34; ANOVA reaches 1.00 at k=32. Features chosen in >= 5 of 10 seeds, cifar_r18 k=16: Firefly 1 (b800) / 5 (b3000), PSO 0 / 0, ANOVA 16, RF 16. The wrapper searches pick largely different subsets per seed (consistent with noisy validation fitness and ~20 independent hill climbers); filter baselines are far more stable.
 
+## 2026-10-30 - analysis A6a: baseline transfer evaluation (touches the test split)
+
+- New: experiments/eval_baseline_transfer.py (every baseline subset with k < d scored by run_metaheuristics.evaluate_on_test; the load_dataset tuple is passed unopened; no search, tuning or edits), tests/test_eval_baseline_transfer.py (3 tests incl. a static no-Xte/yte check and one real job). common.load_baseline_transfer() added.
+- Tests: 3 passed; pytest tests/ -q -> 208 passed.
+- `python experiments/eval_baseline_transfer.py` (run 20261030_233155_eval_baseline_transfer, 66.9 s, 15 workers): results/baselines_transfer_digits.csv (100 rows), results/baselines_transfer_cifar_r18.csv (200 rows); no warnings. Cross-check: acc_lr from evaluate_on_test equals the baseline CSV's acc in 100/100 and 200/200 rows.
+- Pattern (descriptive): digits KNN above LR (e.g. ANOVA k=16 0.951 vs 0.922); cifar_r18 KNN below LR (ANOVA k=16 0.545 vs 0.606); linear SVM close to LR on both.
+
