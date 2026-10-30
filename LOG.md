@@ -193,3 +193,10 @@
 - Takeaways (computed): digits b800 Firefly 0.927 at k=16 (rank 2 of 8), 0.950 at k=32 (rank 6); cifar_r18 b800 0.595 at k=16 (rank 4), 0.789 at k=128 (rank 8); cifar_r18 b3000 0.633 at k=16 (rank 3), 0.797 at k=128 (rank 6); highest mean PCA at every CIFAR k shown; all features 0.971 (digits), 0.804 (cifar_r18).
 - Visual check of F1 cifar_r18 b800 and F2 by Claude: consistent with rq1_tests.csv. Cosmetic: the L1 yellow is faint on white (not changed).
 
+## 2026-10-30 - analysis A3: RQ2 cost (exploratory)
+
+- New: experiments/analysis/a3_cost.py (rq2_cost.csv: mean/std of search_s, rerank_s, infer_s, evals_used, rerank_fits, total_fits, total_s per dataset x method x k x budget x mask_type; break-even N = total_s / (infer_all - infer_selected), "never" if <= 0; extra seconds per accuracy point over ANOVA; F4 accuracy vs search time, F5 break-even bars), tests/test_analysis_a3.py.
+- Caveats written into outputs: search_s under parallel load (meta 15 workers, baselines joblib n_jobs=-1); infer_s = batch predict time / test rows, excluding the column slice and the PCA projection (checked in src/evaluate.py); indicative only, see A4.
+- First run: 8 tests passed, 188 total; 140 rows. Review of the printed table found two presentation problems, fixed before commit: (1) digits k=64 (= d) baseline rows were included (all features, not a selection) -> now excluded as in the runner and F1; (2) a method faster AND more accurate than ANOVA got a negative "extra cost" (digits PCA k=32: -0.0321 s per pt) -> now "no extra time (faster than ANOVA)". Tests added for both. Numbers otherwise unchanged; rerun pending.
+- Observations (exploratory): with logistic regression all CIFAR break-even N are finite but large (Firefly 1.9e7 to 4.1e8 test samples); on digits most bars are "never" (inference times ~2e-6 s per sample, differences within timing noise). L1 is the slowest baseline on CIFAR (~840-860 s, saga under parallel load).
+

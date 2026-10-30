@@ -61,6 +61,18 @@ def test_extra_cost_vs_anova(toy):
     mi = _row(t, "mi")
     assert mi.extra_cost_vs_anova == "no accuracy gain" and np.isclose(mi.mean_diff_vs_anova_pts, -10.0)
     assert _row(t, "anova").extra_cost_vs_anova == "-"
+    pca = _row(t, "pca")                          # more accurate AND faster than ANOVA
+    assert pca.extra_cost_vs_anova == "no extra time (faster than ANOVA)"
+    assert np.isnan(pca.extra_s_per_pt_vs_anova) and np.isclose(pca.mean_diff_vs_anova_pts, 5.0)
+
+
+def test_k_at_or_above_d_excluded(toy):
+    b, m = toy
+    extra = pd.DataFrame(_rows(method="anova", k=10, acc=0.9, search_s=1.0, infer_s=2e-6))
+    b = {"toy": pd.concat([b["toy"], extra], ignore_index=True)}
+    t = A3.cost_table(b, m)
+    assert not ((t.method == "anova") & (t.k == 10)).any()
+    assert ((t.method == "all") & (t.k == 10)).any()
 
 
 def test_labels_and_notes(toy):
@@ -86,7 +98,10 @@ def real(tmp_path_factory):
 def test_real_table_structure(real):
     out, baselines, meta, res = real
     t = res["table"]
-    n_base = sum(b.groupby(["method", "k"]).ngroups for b in baselines.values())
+    n_base = sum(b[(b.method == "all") | (b.k < C.dimension(b))].groupby(["method", "k"]).ngroups
+                 for b in baselines.values())
+    assert not ((t.dataset == "digits") & (t.k == 64) & (t.method != "all")).any()
+    assert (t.extra_s_per_pt_vs_anova.dropna() > 0).all()       # never a negative "cost"
     n_meta = sum(m.groupby(["method", "k", "budget", "mask_type"]).ngroups for m in meta.values())
     assert len(t) == n_base + n_meta and (t.n == 10).all()
     rr, raw = t[t.mask_type == "rerank"], t[t.mask_type == "raw"]

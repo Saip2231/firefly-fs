@@ -11,9 +11,12 @@ mask_type); baselines have no budget and mask_type "-":
                 re-times inference on an idle machine).
   extra_s_per_pt_vs_anova
                 (total_s_method - search_s_anova) / mean_diff_pts when the
-                method's mean accuracy exceeds ANOVA's at the same k;
-                otherwise "no accuracy gain".  mean_diff_vs_anova_pts is
-                reported next to it.
+                method's mean accuracy exceeds ANOVA's at the same k and it
+                takes longer; "no extra time (faster than ANOVA)" when it is
+                more accurate and faster; otherwise "no accuracy gain".
+                mean_diff_vs_anova_pts is reported next to it.
+Baseline rows with k >= d (digits k = 64) are all features, not a
+selection, and are left out (as in the runner and F1).
 Timing caveats written into the CSV and figure captions:
   * search_s was measured under parallel load (meta runs: 15 workers;
     baselines: joblib n_jobs=-1), so it is not idle-machine time.
@@ -63,6 +66,8 @@ def per_run(baselines: dict, meta: dict) -> pd.DataFrame:
     """One row per run with the cost columns filled for both sources."""
     parts = []
     for ds, b in baselines.items():
+        d = C.dimension(b)
+        b = b[(b.method == "all") | (b.k < d)]          # k >= d is all features, not a selection
         x = b.assign(dataset=ds, budget=np.nan, mask_type="-", rerank_s=0.0,
                      evals_used=np.nan, rerank_fits=0)
         parts.append(x[["dataset", "method", "k", "budget", "mask_type", "seed", "acc",
@@ -105,11 +110,14 @@ def cost_table(baselines: dict, meta: dict) -> pd.DataFrame:
             continue
         d_pts = (r.acc_mean - a.acc_mean) * 100
         diff.append(d_pts)
-        if d_pts > 0:
-            e = (r.total_s_mean - a.search_s_mean) / d_pts
-            extra.append(e); extra_txt.append(f"{e:.3g} s per pt")
-        else:
+        extra_s = r.total_s_mean - a.search_s_mean
+        if d_pts <= 0:
             extra.append(np.nan); extra_txt.append("no accuracy gain")
+        elif extra_s <= 0:
+            extra.append(np.nan); extra_txt.append("no extra time (faster than ANOVA)")
+        else:
+            e = extra_s / d_pts
+            extra.append(e); extra_txt.append(f"{e:.3g} s per pt")
     t["break_even_samples"] = be_num
     t["break_even"] = be_txt
     t["mean_diff_vs_anova_pts"] = diff
