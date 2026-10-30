@@ -250,3 +250,10 @@
 - `python -m experiments.analyze` (full run): A0-A7 regenerated, A8 skipped (no traces), results/analysis/analysis_manifest.md written; no unregistered outputs.
 - `python -m experiments.analyze --rebuild-check` (2026-10-31): moved 58 analyze-owned files to logs/rebuild_snapshot_20261031_000635_219011, rebuilt, REBUILD CHECK: 58/58 files PASS (every CSV identical, markdown identical apart from the timestamp line, all figures regenerated). The analysis is reproducible from the result CSVs with one command.
 
+## 2026-10-31 - app: B0 foundation (DASHBOARD.md)
+
+- New app/ per DASHBOARD.md section 3: streamlit_app.py (page config, CSS, st.navigation), lib/{data,facts,stats_view,theme,navigation}.py, stubs lib/{traces,models,search_live,safety}.py and components/{kpi_strip,label_grid,swarm_grid}.py, components/callout.py, 10 placeholder pages, .streamlit/config.toml.
+- The Day-4 prototype (app/streamlit_app.py, app/dashboard_data.py) moved to app_legacy/ because its playground scores on the test split (DASHBOARD.md rule 3); tests/test_app.py now points at app_legacy/ (path change only).
+- Deviations, stated: the "playbook" page list is not in the repo, so pages follow the B2-B8 specs; B0 tests live in tests/test_dashboard_b0.py (not app/tests/) so `pytest tests/ -q` gates them; PCA uses the theme text colour (black only in light mode) plus dashes, because black is invisible on the dark surface.
+- Tests: `pytest tests/ -q` -> 261 passed in 227.20 s (231 earlier + 30 in tests/test_dashboard_b0.py). `streamlit run app/streamlit_app.py`: Home shows "Integrity: PASS. 10 of 11 checks passed, 1 informational"; sidebar lists all 10 pages in 5 sections.
+

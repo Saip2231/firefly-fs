@@ -1,5 +1,7 @@
-"""Tests for the dashboard (app/).  Streamlit is not needed: the data logic
-lives in app/dashboard_data.py and streamlit_app.py is checked statically.
+"""Tests for the legacy dashboard prototype (app_legacy/, moved out of app/ in
+Stage B0 of DASHBOARD.md; the new app is tested in test_dashboard_b0.py).
+Streamlit is not needed: the data logic lives in app_legacy/dashboard_data.py
+and streamlit_app.py is checked statically.
 
 (a) the held-out split is named only inside dashboard_data._score_on_test,
     which goes through src.evaluate.evaluate; streamlit_app.py never loads
@@ -21,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-APP = ROOT / "app"
+APP = ROOT / "app_legacy"
 sys.path.insert(0, str(APP))
 import dashboard_data as dd  # noqa: E402
 
