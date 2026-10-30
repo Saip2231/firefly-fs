@@ -2,6 +2,8 @@
 
 This file is loaded at the start of every session. Follow it exactly. If an instruction in a task conflicts with a rule here, stop and ask before acting.
 
+@ANALYSIS.md    
+
 ## 1. Project in one paragraph
 
 Graded college project (100 marks, 5-day timeline). We benchmark binary Firefly feature selection against standard baselines on pretrained image embeddings, with leakage-safe protocol, 10 seeds, matched search budgets, stability and cost analysis, and an interactive Streamlit dashboard. The goal is an honest empirical study, not a new algorithm. A tie or loss for Firefly, measured properly, is a valid result.
