@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import argparse
 
-from experiments.analysis import a0_integrity, a1_rq1, a2_figures, a3_cost, a5_stability
+from experiments.analysis import (a0_integrity, a1_rq1, a2_figures, a3_cost, a5_stability,
+                                  a6_transfer)
 from experiments.analysis.takeaway import integrity_sentence
 
 STAGES = {
@@ -21,6 +22,7 @@ STAGES = {
     "A2": a2_figures.run,      # F1, F2 + figures/takeaways.csv
     "A3": a3_cost.run,         # RQ2 cost, exploratory; F4, F5
     "A5": a5_stability.run,    # RQ3 stability, exploratory; F6, F7
+    "A6": a6_transfer.run,     # RQ4 transfer, exploratory; needs A6a CSVs; F8
 }
 
 
