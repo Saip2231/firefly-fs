@@ -12,11 +12,12 @@ from __future__ import annotations
 
 import argparse
 
-from experiments.analysis import a0_integrity
+from experiments.analysis import a0_integrity, a1_rq1
 from experiments.analysis.takeaway import integrity_sentence
 
 STAGES = {
     "A0": a0_integrity.run,
+    "A1": a1_rq1.run,          # confirmatory; re-validates A0 itself
 }
 
 
