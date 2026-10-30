@@ -2,7 +2,8 @@
 
 This file is loaded at the start of every session. Follow it exactly. If an instruction in a task conflicts with a rule here, stop and ask before acting.
 
-@ANALYSIS.md    
+@ANALYSIS.md
+@DASHBOARD.md
 
 ## 1. Project in one paragraph
 
