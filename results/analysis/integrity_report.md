@@ -1,6 +1,6 @@
 # Integrity report (Stage A0)
 
-- Generated: 2026-10-30T22:24:11 by `python -m experiments.analyze --only A0`
+- Generated: 2026-10-30T23:12:44 by `python -m experiments.analyze --only A0`
 - Inputs: `results/baselines_digits.csv`, `results/baselines_cifar_r18.csv`, `results/meta_digits.csv`, `results/meta_cifar_r18.csv`, `results/split_hashes.csv`, `PREREG.md`
 - Result: **ALL CHECKS PASSED**
 

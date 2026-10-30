@@ -210,5 +210,13 @@
 - Findings (medians over k and budget, single-sample prediction on training rows, idle machine):
   - Logistic regression: ~131-139 us for every subset AND for all features (cifar 131.9, digits 131.4); single-sample LR time is dominated by call overhead, so selecting features saves nothing (saving -2.7 to -4.8 us: the column slice costs a few us). PCA is slower than all features (~240-250 us; the projection adds ~110 us).
   - KNN (k=5): cifar_r18 all features 7414 us vs ~963 us for every selected subset -> ~6.4 ms saved per prediction; digits 315 vs ~293 us (~24 us saved). PCA on cifar ~1096 us.
+  - Tests: tests/test_time_final.py 8 passed (user confirmed). Committed "analysis: A4 idle-machine timing and contention check".
   - Consequence for RQ2 (to use in the write-up, exploratory): with logistic regression, selection gives no single-sample inference saving, so break-even is "never"; with KNN on cifar_r18 the saving is ~6.4 ms per prediction. With the contention factor 2.95, an idle Firefly search at budget 800, k=16 takes ~10.5 s, i.e. a break-even of roughly 10.5 / 0.0064 ~ 1,600 KNN predictions (order of magnitude; to be computed by script, not by hand, if reported).
+
+## 2026-10-30 - analysis A5: RQ3 stability (exploratory)
+
+- New: experiments/analysis/a5_stability.py (mean pairwise Jaccard over 45 seed pairs per dataset x method x k [x budget x mask_type]; random references empirical and analytic (k^2/d)/(2k - k^2/d); feature-frequency counts; F6 stability bars, F7 feature-frequency curves; split-resampling caveat in every output), tests/test_analysis_a5.py (8 tests).
+- Tests: 8 passed; pytest tests/ -q -> 205 passed. `python -m experiments.analyze --only A5` wrote results/analysis/rq3_stability.csv, rq3_feature_frequency.csv, figures F6 (2) and F7 (6).
+- Sanity: random empirical vs analytic Jaccard agree (ratio 0.87-1.16; cifar_r18 k=128 0.144 vs 0.143; digits k=32 0.336 vs 0.333), so idx parsing and the computation are consistent.
+- Results (raw masks, cifar_r18): ANOVA 0.92-0.98, MI 0.81-0.91, RF 0.71-0.84, L1 0.26-0.41; Firefly 0.05-0.16 and PSO 0.035-0.145 (random 0.014-0.144); seeded variants 0.07-0.27. Digits: Firefly 0.33-0.42 vs random 0.14-0.34; ANOVA reaches 1.00 at k=32. Features chosen in >= 5 of 10 seeds, cifar_r18 k=16: Firefly 1 (b800) / 5 (b3000), PSO 0 / 0, ANOVA 16, RF 16. The wrapper searches pick largely different subsets per seed (consistent with noisy validation fitness and ~20 independent hill climbers); filter baselines are far more stable.
 

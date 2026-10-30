@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import argparse
 
-from experiments.analysis import a0_integrity, a1_rq1, a2_figures, a3_cost
+from experiments.analysis import a0_integrity, a1_rq1, a2_figures, a3_cost, a5_stability
 from experiments.analysis.takeaway import integrity_sentence
 
 STAGES = {
@@ -20,6 +20,7 @@ STAGES = {
     "A1": a1_rq1.run,          # confirmatory; re-validates A0 itself
     "A2": a2_figures.run,      # F1, F2 + figures/takeaways.csv
     "A3": a3_cost.run,         # RQ2 cost, exploratory; F4, F5
+    "A5": a5_stability.run,    # RQ3 stability, exploratory; F6, F7
 }
 
 
