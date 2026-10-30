@@ -16,10 +16,10 @@ Research questions: RQ1 accuracy at fixed k; RQ2 search cost and break-even; RQ3
 - [x] Day 2: baselines (10 seeds, both datasets), leakage tests (14)
 - [x] Day 3: Firefly validated, diagnostics, rerank, timing (33 tests pass)
 - [x] Day 4: init_pop, PSO, registry, tuning, frozen config (7b985ca), runner, PREREG, compute plan (127 tests pass)
-- [ ] Day 5: main runs, analysis scripts, figures, dashboard wiring (dashboard skeleton done: app/, 135 tests pass)
-- [ ] Day 5+: cost/stability/transfer write-up, report, slides
+- [x] Day 5: main runs (960 rows), analysis A0-A7 + A9 (A8 convergence deferred: no traces yet), 231 tests pass; dashboard skeleton (app/) not yet wired to the meta results
+- [ ] Day 5+: A8 traces, dashboard wiring (break-even slider, stability tab), cost/stability/transfer write-up, report, slides
 
-Current stage: Day 5, before launch (PREREG commit + `git tag day5-launch`, OneDrive paused, sleep off). Last commit: see `git log` (frozen config = 7b985ca).
+Current stage: analysis complete except A8; `python -m experiments.analyze --rebuild-check` -> 58/58 PASS. Last commit: see `git log` (frozen config = 7b985ca, tag day5-launch).
 
 ## 3. Environment and commands (Windows, PowerShell)
 

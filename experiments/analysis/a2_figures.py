@@ -163,7 +163,7 @@ def plot_f2(tests: pd.DataFrame):
 def make_figures(baselines: dict, meta: dict, out_dir=C.FIGURES, takeaways=None) -> list[dict]:
     """Draw and save F1 (per dataset x budget) and F2; record takeaways."""
     takeaways = takeaways or out_dir / "takeaways.csv"
-    made = []
+    made, f1_frames = [], []
     for ds in C.DATASETS:
         for b in sorted(int(x) for x in meta[ds].budget.unique()):
             frame = f1_frame(baselines, meta, ds, b)
@@ -174,6 +174,11 @@ def make_figures(baselines: dict, meta: dict, out_dir=C.FIGURES, takeaways=None)
             text = f1_takeaway(frame)
             T.record(name, [p.name for p in paths], text, takeaways)
             made.append(dict(figure=name, files=paths, takeaway=text, frame=frame))
+            f1_frames.append(frame)
+    # F1's plotted numbers, so A9 can compare the figures by their data
+    data_dir = out_dir / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    pd.concat(f1_frames, ignore_index=True).to_csv(data_dir / "F1_frames.csv", index=False)
     tests = f2_frame(baselines, meta)
     fig = plot_f2(tests)
     paths = S.save_fig(fig, "F2_rq1_grid", out_dir)
