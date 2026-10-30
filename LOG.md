@@ -186,3 +186,10 @@
 - `python -m experiments.analyze --only A1` -> results/analysis/rq1_tests.csv (72 rows), descriptive.csv, rq1_summary.md. Result: 5 WIN, 24 LOSS, 43 TIE. Per comparator: anova 1W/3L/8T, mi 2W/2L/8T, l1 1W/3L/8T, rf 0W/8L/4T, pca 0W/8L/4T, pso 1W/0L/11T. Mean differences from -16.6 pts (vs PCA, cifar_r18 k=16 b=800) to +7.5 pts (vs MI, cifar_r18 k=16 b=3000). Digits: 23 TIE, 1 LOSS (l1, k=32, b=800). All 5 WINs are at cifar_r18 k=16 (MI at b=800; ANOVA, MI, L1, PSO at b=3000).
 - Spot check (rule 12) of cifar_r18 k=16: means in rq1_tests.csv equal descriptive.csv (anova 0.6063, rf 0.6584, pca 0.7618); Holm values recomputed by hand from the raw p (smallest p 2/1024 x 6 = 0.0117). Firefly raw mean rises 0.5954 -> 0.6334 from b=800 to 3000 while PSO stays 0.5839 -> 0.5833 (consistent with PSO's collapsed final diversity; to examine in A7, exploratory). No sign of a bug.
 
+## 2026-10-30 - analysis A2: figures F1 and F2
+
+- New: experiments/analysis/a2_figures.py (F1 accuracy vs k per dataset x budget, mean +/- 1 std, all features as a line, PCA dashed "projection, not a selector", no seeded variants; F2 12 x 6 RQ1 grid coloured WIN/LOSS/TIE with mean difference and Holm p, tests recomputed by a1_rq1.run_rq1), takeaway.record() (upserts figures/takeaways.csv), tests/test_analysis_a2.py (8 tests).
+- Tests: 8 passed; pytest tests/ -q -> 180 passed. `python -m experiments.analyze --only A2` wrote figures/F1_acc_vs_k_{digits,cifar_r18}_b{800,3000}.{png,pdf}, figures/F2_rq1_grid.{png,pdf}, figures/takeaways.csv (5 rows).
+- Takeaways (computed): digits b800 Firefly 0.927 at k=16 (rank 2 of 8), 0.950 at k=32 (rank 6); cifar_r18 b800 0.595 at k=16 (rank 4), 0.789 at k=128 (rank 8); cifar_r18 b3000 0.633 at k=16 (rank 3), 0.797 at k=128 (rank 6); highest mean PCA at every CIFAR k shown; all features 0.971 (digits), 0.804 (cifar_r18).
+- Visual check of F1 cifar_r18 b800 and F2 by Claude: consistent with rq1_tests.csv. Cosmetic: the L1 yellow is faint on white (not changed).
+

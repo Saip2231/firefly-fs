@@ -40,6 +40,21 @@ def best_mean(df: pd.DataFrame, value: str = "mean", by: str = "method") -> tupl
     return C.DISPLAY.get(r[by], r[by]), float(r[value])
 
 
+TAKEAWAY_COLUMNS = ["figure", "files", "takeaway"]
+
+
+def record(figure: str, files, text: str, path=None) -> None:
+    """Upsert one row (figure, files, takeaway) in figures/takeaways.csv;
+    rerunning a stage replaces its rows instead of appending duplicates."""
+    path = path or C.FIGURES / "takeaways.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df = pd.read_csv(path) if path.exists() else pd.DataFrame(columns=TAKEAWAY_COLUMNS)
+    df = df[df.figure != figure]
+    row = pd.DataFrame([dict(figure=figure, files=";".join(str(f) for f in files), takeaway=text)])
+    out = pd.concat([df, row], ignore_index=True) if len(df) else row
+    out.sort_values("figure").to_csv(path, index=False)
+
+
 def integrity_sentence(checks) -> str:
     """One line for the A0 output, from the check results."""
     real = [c for c in checks if not c.info]
