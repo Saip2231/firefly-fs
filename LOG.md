@@ -158,3 +158,16 @@
 - `streamlit run app/streamlit_app.py`: Overview, explorer (meta_*.csv absent -> "Showing baselines only") and playground all render. Not deployed.
 - Process note: one read-only `grep` was run through the shell by Claude while editing (CLAUDE.md rule 2); nothing changed.
 
+## 2026-10-30 - day5: preflight and main runs
+
+- experiments/preflight_day5.py (read-only): first run 1 FAIL (untracked .agents/ and .claude/, local tool folders) -> added to .gitignore, committed with the script ("day5: preflight script; ignore local tool folders", dd8c6dc). Second run: ALL CHECKS PASSED (18 items): tree clean; tag day5-launch -> b8c3209 holds PREREG.md and frozen_config.yaml identical to the working copy; PREREG cites 7b985ca (last change of the config) and was committed 2026-10-29T23:22:44+05:30, before any Day-5 row; config_hash b14f6b19...; grid 480 jobs, 960 rows, 12 families = PREREG; 16 CPUs, 34.8 GB free. Stall-swap share is not logged by the runner; a post-hoc diagnostic was preferred over changing src/ after the tag.
+- OneDrive paused, sleep off, n_jobs = 15. Runs (no files edited between them):
+  | run | command | row run_id | runs.json id | rows | runtime |
+  |---|---|---|---|---|---|
+  | 1 | `--dataset digits --budgets 800 3000` | 20261030_091644_meta_digits | 20261030_093218_meta_digits | 320 | 934.4 s |
+  | 2 | `--dataset cifar_r18 --budgets 800` | 20261030_093755_meta_cifar_r18 | 20261030_095505_meta_cifar_r18 | 320 | 1029.9 s |
+  | 3 | `--dataset cifar_r18 --budgets 3000` | (see CSV) | 20261030_105128_meta_cifar_r18 | 320 | 3167.4 s |
+- Checks on the CSVs: results/meta_digits.csv 320 rows, results/meta_cifar_r18.csv 640 rows; every row has evals_used == budget and rerank_fits 0 (raw) / 50 (rerank); config_hash b14f6b19... on all rows.
+- git_hash on the rows: digits `dd8c6dc`; both CIFAR runs `dd8c6dc+dirty`. Cause checked with `git status --short` during run 2: the only modified tracked file was results/runs.json (run 1's log_experiment append); results/meta_*.csv were untracked. Same code as dd8c6dc. Follow-up after Day 5: git_hash() should ignore changes under results/.
+- Backups of meta_digits.csv and meta_cifar_r18.csv (after run 2) in ../backup_day5/ (outside the repo).
+

@@ -9632,5 +9632,313 @@
       "total_workers_h": 1.34,
       "git_hash": "7a23b78+dirty"
     }
+  },
+  {
+    "run_id": "20261030_093218_meta_digits",
+    "timestamp": "2026-10-30T09:32:18.437250+05:30",
+    "dataset": "meta_digits",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      16,
+      32
+    ],
+    "params": {
+      "dataset": "digits",
+      "methods": [
+        "firefly",
+        "pso",
+        "firefly_seeded",
+        "pso_seeded"
+      ],
+      "budgets": [
+        800,
+        3000
+      ],
+      "ks": [
+        16,
+        32
+      ],
+      "skipped_ks": [
+        64
+      ],
+      "config_file": "frozen_config.yaml",
+      "config_hash": "b14f6b194e4f7b9db64a0ad4ff20bb681dd1a33d9ee7307ee8506e35e614569d",
+      "config": {
+        "_comment": "FROZEN (Day 4 Stage 6). Hyperparameters from the mechanical decision rule in results/tuning_decision.md. No changes after the 'day4: frozen config' commit (CLAUDE.md rule 10). JSON flow style = valid YAML; loads without PyYAML.",
+        "firefly": {
+          "n_fireflies": 10,
+          "beta0": 0.4,
+          "gamma": 2.0,
+          "alpha": 0.02
+        },
+        "pso": {
+          "n_particles": 20,
+          "w_start": 1.0,
+          "w_end": 0.4,
+          "c1": 1.5,
+          "c2": 1.5,
+          "vmax": 0.5
+        },
+        "frac_seeded": 0.5,
+        "top_m": 10,
+        "n_splits": 5,
+        "provenance": {
+          "tuning_runs": "results/tuning_runs.csv (162 runs, seeds 100-102, git 831fd93)",
+          "tuning_summary_run_id": "20261029_144439_tune_summary",
+          "decision_file": "results/tuning_decision.md",
+          "firefly_decision": "n_fireflies=10 (beats default by 0.0056 >= 0.003)",
+          "pso_decision": "w_start=1.0 (beats default by 0.0030309 >= 0.003)",
+          "fixed_in_code": "binary_pso stall_swap=True; firefly_levy uses the firefly block with levy=True",
+          "population_note": "Population sizes differ (Firefly 10, PSO 20): plain methods share Firefly's 10 members (PSO's first 10 particles); seeded methods share only their first 5 members (firefly_seeded seeds 5 of 10, pso_seeded 10 of 20). Kept as tuned and disclosed in PREREG.md."
+        }
+      },
+      "force": false,
+      "n_jobs": 15,
+      "classifiers": {
+        "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+        "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+        "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+        "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+      }
+    },
+    "csv_paths": [
+      "results\\meta_digits.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "run_id": "20261030_091644_meta_digits",
+      "git_hash": "dd8c6dc",
+      "jobs_run": 160,
+      "rows_total": 320,
+      "runtime_s": 934.4
+    }
+  },
+  {
+    "run_id": "20261030_095505_meta_cifar_r18",
+    "timestamp": "2026-10-30T09:55:05.368995+05:30",
+    "dataset": "meta_cifar_r18",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "params": {
+      "dataset": "cifar_r18",
+      "methods": [
+        "firefly",
+        "pso",
+        "firefly_seeded",
+        "pso_seeded"
+      ],
+      "budgets": [
+        800
+      ],
+      "ks": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "skipped_ks": [],
+      "config_file": "frozen_config.yaml",
+      "config_hash": "b14f6b194e4f7b9db64a0ad4ff20bb681dd1a33d9ee7307ee8506e35e614569d",
+      "config": {
+        "_comment": "FROZEN (Day 4 Stage 6). Hyperparameters from the mechanical decision rule in results/tuning_decision.md. No changes after the 'day4: frozen config' commit (CLAUDE.md rule 10). JSON flow style = valid YAML; loads without PyYAML.",
+        "firefly": {
+          "n_fireflies": 10,
+          "beta0": 0.4,
+          "gamma": 2.0,
+          "alpha": 0.02
+        },
+        "pso": {
+          "n_particles": 20,
+          "w_start": 1.0,
+          "w_end": 0.4,
+          "c1": 1.5,
+          "c2": 1.5,
+          "vmax": 0.5
+        },
+        "frac_seeded": 0.5,
+        "top_m": 10,
+        "n_splits": 5,
+        "provenance": {
+          "tuning_runs": "results/tuning_runs.csv (162 runs, seeds 100-102, git 831fd93)",
+          "tuning_summary_run_id": "20261029_144439_tune_summary",
+          "decision_file": "results/tuning_decision.md",
+          "firefly_decision": "n_fireflies=10 (beats default by 0.0056 >= 0.003)",
+          "pso_decision": "w_start=1.0 (beats default by 0.0030309 >= 0.003)",
+          "fixed_in_code": "binary_pso stall_swap=True; firefly_levy uses the firefly block with levy=True",
+          "population_note": "Population sizes differ (Firefly 10, PSO 20): plain methods share Firefly's 10 members (PSO's first 10 particles); seeded methods share only their first 5 members (firefly_seeded seeds 5 of 10, pso_seeded 10 of 20). Kept as tuned and disclosed in PREREG.md."
+        }
+      },
+      "force": false,
+      "n_jobs": 15,
+      "classifiers": {
+        "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+        "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+        "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+        "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+      }
+    },
+    "csv_paths": [
+      "results\\meta_cifar_r18.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "run_id": "20261030_093755_meta_cifar_r18",
+      "git_hash": "dd8c6dc+dirty",
+      "jobs_run": 160,
+      "rows_total": 320,
+      "runtime_s": 1029.9
+    }
+  },
+  {
+    "run_id": "20261030_105128_meta_cifar_r18",
+    "timestamp": "2026-10-30T10:51:28.260034+05:30",
+    "dataset": "meta_cifar_r18",
+    "kind": "experiment",
+    "n_seeds": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ks": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "params": {
+      "dataset": "cifar_r18",
+      "methods": [
+        "firefly",
+        "pso",
+        "firefly_seeded",
+        "pso_seeded"
+      ],
+      "budgets": [
+        3000
+      ],
+      "ks": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "skipped_ks": [],
+      "config_file": "frozen_config.yaml",
+      "config_hash": "b14f6b194e4f7b9db64a0ad4ff20bb681dd1a33d9ee7307ee8506e35e614569d",
+      "config": {
+        "_comment": "FROZEN (Day 4 Stage 6). Hyperparameters from the mechanical decision rule in results/tuning_decision.md. No changes after the 'day4: frozen config' commit (CLAUDE.md rule 10). JSON flow style = valid YAML; loads without PyYAML.",
+        "firefly": {
+          "n_fireflies": 10,
+          "beta0": 0.4,
+          "gamma": 2.0,
+          "alpha": 0.02
+        },
+        "pso": {
+          "n_particles": 20,
+          "w_start": 1.0,
+          "w_end": 0.4,
+          "c1": 1.5,
+          "c2": 1.5,
+          "vmax": 0.5
+        },
+        "frac_seeded": 0.5,
+        "top_m": 10,
+        "n_splits": 5,
+        "provenance": {
+          "tuning_runs": "results/tuning_runs.csv (162 runs, seeds 100-102, git 831fd93)",
+          "tuning_summary_run_id": "20261029_144439_tune_summary",
+          "decision_file": "results/tuning_decision.md",
+          "firefly_decision": "n_fireflies=10 (beats default by 0.0056 >= 0.003)",
+          "pso_decision": "w_start=1.0 (beats default by 0.0030309 >= 0.003)",
+          "fixed_in_code": "binary_pso stall_swap=True; firefly_levy uses the firefly block with levy=True",
+          "population_note": "Population sizes differ (Firefly 10, PSO 20): plain methods share Firefly's 10 members (PSO's first 10 particles); seeded methods share only their first 5 members (firefly_seeded seeds 5 of 10, pso_seeded 10 of 20). Kept as tuned and disclosed in PREREG.md."
+        }
+      },
+      "force": false,
+      "n_jobs": 15,
+      "classifiers": {
+        "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+        "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+        "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+        "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+      }
+    },
+    "csv_paths": [
+      "results\\meta_cifar_r18.csv"
+    ],
+    "python": "3.11.4",
+    "platform": "Windows-10",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.1",
+    "classifiers": {
+      "final_clf": "LogisticRegression(max_iter=500, random_state=0)",
+      "search_clf": "LogisticRegression(max_iter=100, random_state=seed)",
+      "knn_clf": "KNeighborsClassifier(n_neighbors=5)",
+      "svm_clf": "LinearSVC(max_iter=5000, random_state=0)"
+    },
+    "extra": {
+      "run_id": "20261030_095840_meta_cifar_r18",
+      "git_hash": "dd8c6dc+dirty",
+      "jobs_run": 160,
+      "rows_total": 640,
+      "runtime_s": 3167.4
+    }
   }
 ]
