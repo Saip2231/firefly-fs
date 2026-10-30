@@ -226,4 +226,11 @@
 - Tests: 3 passed; pytest tests/ -q -> 208 passed.
 - `python experiments/eval_baseline_transfer.py` (run 20261030_233155_eval_baseline_transfer, 66.9 s, 15 workers): results/baselines_transfer_digits.csv (100 rows), results/baselines_transfer_cifar_r18.csv (200 rows); no warnings. Cross-check: acc_lr from evaluate_on_test equals the baseline CSV's acc in 100/100 and 200/200 rows.
 - Pattern (descriptive): digits KNN above LR (e.g. ANOVA k=16 0.951 vs 0.922); cifar_r18 KNN below LR (ANOVA k=16 0.545 vs 0.606); linear SVM close to LR on both.
+- Committed "analysis: A6a baseline transfer evaluation".
+
+## 2026-10-30 - analysis A6: RQ4 transfer (exploratory, descriptive)
+
+- New: experiments/analysis/a6_transfer.py (rq4_transfer.csv: firefly/pso vs anova, mi, l1, rf per family and classifier, paired mean differences in points, seeds higher/lower, no p-values; rq4_gaps.csv: LR-KNN and LR-SVM gaps; F8), tests/test_analysis_a6.py (7 tests, incl. LR reference rows = A1 numbers).
+- Tests: 7 passed; pytest tests/ -q -> 215 passed. Outputs: rq4_transfer.csv 288 rows, rq4_gaps.csv 78 rows, F8 x 2.
+- Results (descriptive): under KNN and SVM the Firefly/PSO subsets trail RF on cifar_r18 (about -2 to -10 pts) and are mixed vs ANOVA/MI/L1; the largest positive cells are again cifar_r18 k=16 b=3000 (+2.5 to +8.1). Firefly's mean is above the comparator's in 7/32 (KNN) and 8/32 (SVM) cifar_r18 cells, 3/16 and 6/16 on digits. LR-minus-KNN gaps on cifar_r18: Firefly 6.6-7.6 pts vs ANOVA 5.7-6.1 (LR-tailored subsets transfer slightly worse to KNN); digits gaps negative (KNN above LR).
 
