@@ -1,0 +1,723 @@
+{
+  "generated": "2026-10-31T09:08:09",
+  "command": "python experiments/build_app_assets.py",
+  "build_git_hash": "a27c4da+dirty",
+  "environment": {
+    "python": "C:\\Users\\Sai Prashanth\\OneDrive\\Desktop\\New folder\\firefly\\firefly-fs\\.venv\\Scripts\\python.exe",
+    "python_version": "3.11.4",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.1",
+    "in_project_venv": true
+  },
+  "rows": {
+    "meta": {
+      "digits": 320,
+      "cifar_r18": 640
+    },
+    "meta_total": 960,
+    "meta_raw": 480,
+    "baselines": {
+      "digits": 190,
+      "cifar_r18": 250
+    }
+  },
+  "split_rows": {
+    "digits": {
+      "total": 1797,
+      "train": 1437,
+      "test": 360
+    },
+    "cifar_r18": {
+      "total": 10000,
+      "train": 8000,
+      "test": 2000
+    }
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "budgets": [
+    800,
+    3000
+  ],
+  "k": {
+    "digits": [
+      16,
+      32
+    ],
+    "cifar_r18": [
+      16,
+      32,
+      64,
+      128
+    ]
+  },
+  "d": {
+    "digits": 64,
+    "cifar_r18": 512
+  },
+  "methods": {
+    "meta": [
+      "firefly",
+      "firefly_seeded",
+      "pso",
+      "pso_seeded"
+    ],
+    "baselines": [
+      "all",
+      "anova",
+      "l1",
+      "mi",
+      "pca",
+      "random",
+      "rf"
+    ]
+  },
+  "rq1": {
+    "tests": 72,
+    "families": 12,
+    "comparators": [
+      "anova",
+      "l1",
+      "mi",
+      "pca",
+      "pso",
+      "rf"
+    ],
+    "labels": {
+      "WIN": 5,
+      "LOSS": 24,
+      "TIE": 43
+    }
+  },
+  "config_hash": {
+    "results": [
+      "b14f6b194e4f7b9db64a0ad4ff20bb681dd1a33d9ee7307ee8506e35e614569d"
+    ],
+    "frozen_config": "b14f6b194e4f7b9db64a0ad4ff20bb681dd1a33d9ee7307ee8506e35e614569d",
+    "consistent": true
+  },
+  "git_hashes": {
+    "digits": [
+      "dd8c6dc"
+    ],
+    "cifar_r18": [
+      "dd8c6dc+dirty"
+    ]
+  },
+  "pytest": {
+    "passed": 295,
+    "source": "LOG.md (last 'N passed')"
+  },
+  "load_inflation_factor": {
+    "value": 2.95,
+    "source": "results/analysis/contention_factor.md (A4)"
+  },
+  "traces": [
+    {
+      "file": "app/assets/traces/cifar_r18_k16_b3000_firefly_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly",
+      "k": 16,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 72,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 20627
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k16_b3000_firefly_seeded_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly_seeded",
+      "k": 16,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 73,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 20702
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k16_b3000_pso_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "pso",
+      "k": 16,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 407,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 21613
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k16_b800_firefly_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly",
+      "k": 16,
+      "budget": 800,
+      "seed": 0,
+      "frames": 20,
+      "frames_total": 20,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 11729
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k16_b800_firefly_seeded_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly_seeded",
+      "k": 16,
+      "budget": 800,
+      "seed": 0,
+      "frames": 20,
+      "frames_total": 20,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 11541
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k16_b800_pso_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "pso",
+      "k": 16,
+      "budget": 800,
+      "seed": 0,
+      "frames": 47,
+      "frames_total": 47,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 21886
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k64_b3000_firefly_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly",
+      "k": 64,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 80,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 25560
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k64_b3000_firefly_seeded_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly_seeded",
+      "k": 64,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 78,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 24698
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k64_b3000_pso_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "pso",
+      "k": 64,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 165,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 48391
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k64_b800_firefly_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly",
+      "k": 64,
+      "budget": 800,
+      "seed": 0,
+      "frames": 21,
+      "frames_total": 21,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 14520
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k64_b800_firefly_seeded_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "firefly_seeded",
+      "k": 64,
+      "budget": 800,
+      "seed": 0,
+      "frames": 21,
+      "frames_total": 21,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 14312
+    },
+    {
+      "file": "app/assets/traces/cifar_r18_k64_b800_pso_s0.npz",
+      "dataset": "cifar_r18",
+      "method": "pso",
+      "k": 64,
+      "budget": 800,
+      "seed": 0,
+      "frames": 42,
+      "frames_total": 42,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 35199
+    },
+    {
+      "file": "app/assets/traces/digits_k16_b3000_firefly_s0.npz",
+      "dataset": "digits",
+      "method": "firefly",
+      "k": 16,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 122,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 9096
+    },
+    {
+      "file": "app/assets/traces/digits_k16_b3000_firefly_seeded_s0.npz",
+      "dataset": "digits",
+      "method": "firefly_seeded",
+      "k": 16,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 91,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 8365
+    },
+    {
+      "file": "app/assets/traces/digits_k16_b3000_pso_s0.npz",
+      "dataset": "digits",
+      "method": "pso",
+      "k": 16,
+      "budget": 3000,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 561,
+      "evals_used": 3000,
+      "match": true,
+      "bytes": 13916
+    },
+    {
+      "file": "app/assets/traces/digits_k16_b800_firefly_s0.npz",
+      "dataset": "digits",
+      "method": "firefly",
+      "k": 16,
+      "budget": 800,
+      "seed": 0,
+      "frames": 22,
+      "frames_total": 22,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 7839
+    },
+    {
+      "file": "app/assets/traces/digits_k16_b800_firefly_seeded_s0.npz",
+      "dataset": "digits",
+      "method": "firefly_seeded",
+      "k": 16,
+      "budget": 800,
+      "seed": 0,
+      "frames": 22,
+      "frames_total": 22,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 7306
+    },
+    {
+      "file": "app/assets/traces/digits_k16_b800_pso_s0.npz",
+      "dataset": "digits",
+      "method": "pso",
+      "k": 16,
+      "budget": 800,
+      "seed": 0,
+      "frames": 60,
+      "frames_total": 109,
+      "evals_used": 800,
+      "match": true,
+      "bytes": 12373
+    }
+  ],
+  "demo_models": {
+    "dataset": "cifar_r18",
+    "seed": 0,
+    "budget": 800,
+    "model_keys": [
+      "all__k512",
+      "anova__k16",
+      "mi__k16",
+      "l1__k16",
+      "rf__k16",
+      "firefly__k16",
+      "pso__k16",
+      "firefly_seeded__k16",
+      "pso_seeded__k16",
+      "consensus__k16",
+      "pca__k16",
+      "anova__k32",
+      "mi__k32",
+      "l1__k32",
+      "rf__k32",
+      "firefly__k32",
+      "pso__k32",
+      "firefly_seeded__k32",
+      "pso_seeded__k32",
+      "consensus__k32",
+      "pca__k32",
+      "anova__k64",
+      "mi__k64",
+      "l1__k64",
+      "rf__k64",
+      "firefly__k64",
+      "pso__k64",
+      "firefly_seeded__k64",
+      "pso_seeded__k64",
+      "consensus__k64",
+      "pca__k64",
+      "anova__k128",
+      "mi__k128",
+      "l1__k128",
+      "rf__k128",
+      "firefly__k128",
+      "pso__k128",
+      "firefly_seeded__k128",
+      "pso_seeded__k128",
+      "consensus__k128",
+      "pca__k128"
+    ]
+  },
+  "digits": {
+    "seed": 0,
+    "holdout_frac": 0.25
+  },
+  "blocked": {},
+  "budgets_check": {
+    "trace_max_bytes": 5242880,
+    "assets_max_bytes": 157286400,
+    "assets_total_bytes": 47126514,
+    "ok": true
+  },
+  "assets": {
+    "app/assets/demo_models.npz": {
+      "bytes": 617977,
+      "sha256": "379898595021ba7897e99e811bad5f3170f989e8bb1772327ca0814da928e066"
+    },
+    "app/assets/digits.npz": {
+      "bytes": 42474,
+      "sha256": "558e47c66a237b9878e703990ceb8d24570783fdeef71537be823c42dff34f62"
+    },
+    "app/assets/embedding_recipe.json": {
+      "bytes": 915,
+      "sha256": "7077c95e29edf910af35d66ccade4d7c7fb1c91a11f054049c265a961bcdc6cc"
+    },
+    "app/assets/gallery/00_airplane.png": {
+      "bytes": 1883,
+      "sha256": "0c19854e8fe71b34857a8e7db9161f386c5a8b8a36689010e017443b0246fd2b"
+    },
+    "app/assets/gallery/01_airplane.png": {
+      "bytes": 1480,
+      "sha256": "614eaca21a035c4c1c2538bc3215629e559c46d774bb25ad610997fb235dfe0d"
+    },
+    "app/assets/gallery/02_airplane.png": {
+      "bytes": 2324,
+      "sha256": "dde217f8c1ea792174060dee612894899b2f080df33f79d19e8d94eebafec77e"
+    },
+    "app/assets/gallery/03_automobile.png": {
+      "bytes": 2343,
+      "sha256": "20b984e3018883898fac6661f133e8cf288073337eaa81b83e3de800134e46ba"
+    },
+    "app/assets/gallery/04_automobile.png": {
+      "bytes": 2358,
+      "sha256": "1f573d04aa1ef8eb7183f2adcef1ff5e796bc34499776862c65afc18217a8005"
+    },
+    "app/assets/gallery/05_automobile.png": {
+      "bytes": 2184,
+      "sha256": "38bdb5f7414311f3bc972601d4712ad95a7b2f18f5066c00af76a950cda1deb6"
+    },
+    "app/assets/gallery/06_bird.png": {
+      "bytes": 2155,
+      "sha256": "38fe42a4b47d431f4ff835e6918b918e4ab9d523d207960c10b8e176f4f1ecbc"
+    },
+    "app/assets/gallery/07_bird.png": {
+      "bytes": 2000,
+      "sha256": "df840dd1d9db7fd2e732e87eed9119b02eee0618b7a33d2d06adc8c560d29010"
+    },
+    "app/assets/gallery/08_bird.png": {
+      "bytes": 2223,
+      "sha256": "f7e62c4b3f7f4d13787a161f68fe833acef4d7f3ae2b88c4fc9916bf52a3f5ba"
+    },
+    "app/assets/gallery/09_cat.png": {
+      "bytes": 2369,
+      "sha256": "b7a4f96116b115b1f8efcf70c4aab93c72b2df8814e481729a4aa839a78225be"
+    },
+    "app/assets/gallery/10_cat.png": {
+      "bytes": 2114,
+      "sha256": "1a9c8427ef1ae36f06c46da85083a08a6f130e85c6b39d2e84d6e4d6476fc32e"
+    },
+    "app/assets/gallery/11_cat.png": {
+      "bytes": 2422,
+      "sha256": "17e0ce5a3b6da683f8b1085546eba363e2f7e75aeef3c43ea8cd58690f749420"
+    },
+    "app/assets/gallery/12_deer.png": {
+      "bytes": 2325,
+      "sha256": "34c1e44d5d207aba5a819b08cfe010e2e85e9d85eaedc347f32731dd1c87e0bb"
+    },
+    "app/assets/gallery/13_deer.png": {
+      "bytes": 2296,
+      "sha256": "d2ac92035e5079a45fe29dbbc5522e1fb0a6282ca8aa6bc0d5a6ef3626721e0d"
+    },
+    "app/assets/gallery/14_deer.png": {
+      "bytes": 2526,
+      "sha256": "1c0c3aa6b3f7cdc07284bb6778171481842451e0c59d8f7492a4242a78ea1a00"
+    },
+    "app/assets/gallery/15_dog.png": {
+      "bytes": 2493,
+      "sha256": "38053a9c614190053e0aeea46f7312152cdb219a0c83e79ee62f05894533a6af"
+    },
+    "app/assets/gallery/16_dog.png": {
+      "bytes": 2359,
+      "sha256": "bd8e89016024bfeece698dfd06461965672e4b93ac6d60c06f58c6b70be77ec2"
+    },
+    "app/assets/gallery/17_dog.png": {
+      "bytes": 2313,
+      "sha256": "c79be81fc6782e1baca8e2c90c608efa886e168f6e8144b562b9684aacc51e91"
+    },
+    "app/assets/gallery/18_frog.png": {
+      "bytes": 2440,
+      "sha256": "699cff1e2ec7c60a5248d813757a8cbc361b04cd4d497e6510fe9a4accdc841c"
+    },
+    "app/assets/gallery/19_frog.png": {
+      "bytes": 1966,
+      "sha256": "2a801114ac4b754269b6e1552c8fef70ab697eb29a4aebb5fd5fa65271f5bad5"
+    },
+    "app/assets/gallery/20_frog.png": {
+      "bytes": 2641,
+      "sha256": "4e9543ba9fa579c69bd1bc3de12d7e3e0a4af82aa4c30f018247a2919e874bef"
+    },
+    "app/assets/gallery/21_horse.png": {
+      "bytes": 2208,
+      "sha256": "a82d1ebc90675d4f129178ff1c4964d1eff35423709f3d538c532c349a3b43b3"
+    },
+    "app/assets/gallery/22_horse.png": {
+      "bytes": 2521,
+      "sha256": "c65e3543da7b2547fe118f62b0775731d009afab40321ec989c772d53f5eb07a"
+    },
+    "app/assets/gallery/23_horse.png": {
+      "bytes": 2563,
+      "sha256": "81b87c1a54e5ebc998f4b19c89f784c496d3886e29c4b98b7095665d9fe612da"
+    },
+    "app/assets/gallery/24_ship.png": {
+      "bytes": 2299,
+      "sha256": "016a7e9eeb4c93b01c021b7db7c193b1b3751b0cc46a243fc4627e09d04d6dfd"
+    },
+    "app/assets/gallery/25_ship.png": {
+      "bytes": 1897,
+      "sha256": "3858865d35ed189e5e59481e97164d52d21b07e23eb9e4855c237f3bab9df056"
+    },
+    "app/assets/gallery/26_ship.png": {
+      "bytes": 2331,
+      "sha256": "546bcc1088af41222447f4dffd5df53c7440f9eb6b15c4df7a04d0a6ea8c49f4"
+    },
+    "app/assets/gallery/27_truck.png": {
+      "bytes": 2227,
+      "sha256": "ab5c13a76d90d2d7a09a8afcf593114634ad2911ff45c7a297e0739a72e5403e"
+    },
+    "app/assets/gallery/28_truck.png": {
+      "bytes": 2217,
+      "sha256": "78cd1dc63e59ac7b6beec69e6ec73e2f40470c912b6293bbc392d86c40316a98"
+    },
+    "app/assets/gallery/29_truck.png": {
+      "bytes": 2305,
+      "sha256": "162fd36f1c906c3dded2641a53fd763fb5b77494366d1fb64f8f433055af61ec"
+    },
+    "app/assets/gallery/embeddings.npy": {
+      "bytes": 61568,
+      "sha256": "193f9a3f5c278f0ef3e7c6c1b0c6d24e7e555ef15c9ed4e2554a7f05717408fd"
+    },
+    "app/assets/gallery/gallery.json": {
+      "bytes": 5718,
+      "sha256": "c3d29eefc438f8f34f891ae789e8ae655674c2f17d709baa234d466a964a2294"
+    },
+    "app/assets/onnx_check.npz": {
+      "bytes": 466007,
+      "sha256": "6498db9ed5d580a330c35a83ba82821efef8f701be16c50298fc4c4ded330a8d"
+    },
+    "app/assets/resnet18_embed.onnx": {
+      "bytes": 44696386,
+      "sha256": "34afe8677aaaa544d87eb293b201ad108fc7e0af59c555dcccb11a74a02b1ecd"
+    },
+    "app/assets/tables/ablations.csv": {
+      "bytes": 23109,
+      "sha256": "4a4802bcee7cd335cca90dd9745b215188169db4036ea4530240b346b6ffb452"
+    },
+    "app/assets/tables/analysis_manifest.md": {
+      "bytes": 14152,
+      "sha256": "11a8fcfbf0356b8bbc9388398e9e8fb95afcdb1ce058549cb06c0ea73ff85186"
+    },
+    "app/assets/tables/baselines_cifar_r18.csv": {
+      "bytes": 65283,
+      "sha256": "c11a2766cf5a80be0aa9ef1b5a800c464f2e21c2a701c5ff9fddac7e62b4d080"
+    },
+    "app/assets/tables/baselines_digits.csv": {
+      "bytes": 32930,
+      "sha256": "9bb1152e78894f22a678b31a58b75ae3f0abd00eb662ad055e3e63803ea63da0"
+    },
+    "app/assets/tables/baselines_transfer_cifar_r18.csv": {
+      "bytes": 52622,
+      "sha256": "27d061aa5a1c782992020cdb8b36d425dd21c7545114de590c3afceabcb3303b"
+    },
+    "app/assets/tables/baselines_transfer_digits.csv": {
+      "bytes": 12478,
+      "sha256": "0c8d40c4ec434573b5406690262514bdbd7230bdc058ee6f415f03733b914826"
+    },
+    "app/assets/tables/contention.csv": {
+      "bytes": 788,
+      "sha256": "01536d32fc81f17b1038d864b3e468469aadebaf7eec089a0c27eb5068f2af2d"
+    },
+    "app/assets/tables/contention_factor.md": {
+      "bytes": 226,
+      "sha256": "f0e763b38d2eaa79bc647c9fcbe2d78c0f2c102fda4b05d3bc215d9cd67d08f6"
+    },
+    "app/assets/tables/descriptive.csv": {
+      "bytes": 10139,
+      "sha256": "43137c7fa990e18a64e806cf924b61293794543c55ddd47345d84a72d15815bc"
+    },
+    "app/assets/tables/integrity_report.md": {
+      "bytes": 2319,
+      "sha256": "71278c421977cb6efe96852ac434efee8cb86f63cae39ffd6fa5bd151ca723cc"
+    },
+    "app/assets/tables/meta_cifar_r18.csv": {
+      "bytes": 264184,
+      "sha256": "2ae99009e178855621b10b1993662ae4cd41ba51f288746b5a6cfd17e26e7a6c"
+    },
+    "app/assets/tables/meta_digits.csv": {
+      "bytes": 91922,
+      "sha256": "8563ce1991adaa817f193bbb53d5aabf5424b632e71694176048038b2a02740a"
+    },
+    "app/assets/tables/rq1_summary.md": {
+      "bytes": 2420,
+      "sha256": "351058f30e06bebbda60fa3fa36b482f092f047cca133f99e73a42fbbc17e35c"
+    },
+    "app/assets/tables/rq1_tests.csv": {
+      "bytes": 8575,
+      "sha256": "37eb2d4397ff28aec28f81d6a0c5090b9be754f06646af077edcdaf334877ff5"
+    },
+    "app/assets/tables/rq2_cost.csv": {
+      "bytes": 79433,
+      "sha256": "29b7fdff158166b6e6f3f976d02d2514dec788df6d2b15226aee1d9e5ef35596"
+    },
+    "app/assets/tables/rq3_feature_frequency.csv": {
+      "bytes": 3932,
+      "sha256": "dde03928488e24fbb2255317f41552142593c39776509b435021e5460986a1ac"
+    },
+    "app/assets/tables/rq3_stability.csv": {
+      "bytes": 43083,
+      "sha256": "1ec84559435b387ce01700f136a8d6c054c94af3b5bf028a97cf77b1025e0198"
+    },
+    "app/assets/tables/rq4_gaps.csv": {
+      "bytes": 22714,
+      "sha256": "a79f22a507e1e5856d1c233a3f9d68a8b9e692609f25b4ae9c4d77819b083295"
+    },
+    "app/assets/tables/rq4_transfer.csv": {
+      "bytes": 81468,
+      "sha256": "eb5b9a1040d0b02a6228880fcbe6c58eb8c5e25e0bed1ee219a6b17f69918153"
+    },
+    "app/assets/tables/timing_idle.csv": {
+      "bytes": 26237,
+      "sha256": "cc04f19c533863b38ca0b3f0fd0ce59c8da558fa0158e42a7d719522ea96ae27"
+    },
+    "app/assets/traces/cifar_r18_k16_b3000_firefly_s0.npz": {
+      "bytes": 20627,
+      "sha256": "2df4d8a00d873e6279bbe5215b8021b772bf984e45f51a569d8701742629c2b6"
+    },
+    "app/assets/traces/cifar_r18_k16_b3000_firefly_seeded_s0.npz": {
+      "bytes": 20702,
+      "sha256": "4791da31a3d00c5c1c7848e26d9a2bbc4f4595bdd0da59f5cba14a27517cf9ed"
+    },
+    "app/assets/traces/cifar_r18_k16_b3000_pso_s0.npz": {
+      "bytes": 21613,
+      "sha256": "8085d7660b64c082063dd31c8f8e686edd06f843a4d10c3ab6861d4315ad9897"
+    },
+    "app/assets/traces/cifar_r18_k16_b800_firefly_s0.npz": {
+      "bytes": 11729,
+      "sha256": "b179a8b271dfcb3a43b00016b1ebfdf72a6afbadeb71e45617f5201c9b628527"
+    },
+    "app/assets/traces/cifar_r18_k16_b800_firefly_seeded_s0.npz": {
+      "bytes": 11541,
+      "sha256": "57ab725938bb3841576b35e7981eed2ed4773cd86d6d2f4f34feaa3f697c497a"
+    },
+    "app/assets/traces/cifar_r18_k16_b800_pso_s0.npz": {
+      "bytes": 21886,
+      "sha256": "2be20a10fe50e004818d779b04dfba126789bc349d81f9a9943c3197738a15d2"
+    },
+    "app/assets/traces/cifar_r18_k64_b3000_firefly_s0.npz": {
+      "bytes": 25560,
+      "sha256": "eecc57969ec65d49043282c93d7659d92f6f632e091dc6fd7310054c0492e8d5"
+    },
+    "app/assets/traces/cifar_r18_k64_b3000_firefly_seeded_s0.npz": {
+      "bytes": 24698,
+      "sha256": "83815f9cb48f3fc425035a81315bed2152d71fcb416e86361bf3bf6a70122a93"
+    },
+    "app/assets/traces/cifar_r18_k64_b3000_pso_s0.npz": {
+      "bytes": 48391,
+      "sha256": "6fcaa0f30da88f44917723d8b8db567f41858303bf3f80a2a561b303731b6a60"
+    },
+    "app/assets/traces/cifar_r18_k64_b800_firefly_s0.npz": {
+      "bytes": 14520,
+      "sha256": "c7552cca90b324212e2c3338d90d4ae392dad44f148c807909e3a39f8c9dcf8e"
+    },
+    "app/assets/traces/cifar_r18_k64_b800_firefly_seeded_s0.npz": {
+      "bytes": 14312,
+      "sha256": "05445833006842602494c2d40fa1475f24a643b058c26df3f6a19eed0b535598"
+    },
+    "app/assets/traces/cifar_r18_k64_b800_pso_s0.npz": {
+      "bytes": 35199,
+      "sha256": "3972f2c561ff87b78a0515fa40d00f19a27e246b8d1b6db51dc40960483824ee"
+    },
+    "app/assets/traces/digits_k16_b3000_firefly_s0.npz": {
+      "bytes": 9096,
+      "sha256": "02ede80d97390c2058017667884f63a5f6d2c436dd4dffef031d83cf8e4fdca6"
+    },
+    "app/assets/traces/digits_k16_b3000_firefly_seeded_s0.npz": {
+      "bytes": 8365,
+      "sha256": "b66698a66b1587061cd43b835301ad1fc0ca5ccc1ce5f04a3f2bcc0f9ccdc5ca"
+    },
+    "app/assets/traces/digits_k16_b3000_pso_s0.npz": {
+      "bytes": 13916,
+      "sha256": "fce30f598dabec787e23e437c18460a77a671be9eab28d600a14fa5f94fc48c6"
+    },
+    "app/assets/traces/digits_k16_b800_firefly_s0.npz": {
+      "bytes": 7839,
+      "sha256": "b1fbab6d86cdd75a1afa7c4703ed9e4cad3df40745d88dbe71b13e77711366b5"
+    },
+    "app/assets/traces/digits_k16_b800_firefly_seeded_s0.npz": {
+      "bytes": 7306,
+      "sha256": "dd761717f090665a638c5e3c85d4cad02fa094222468ed22cc8fc8fc13838152"
+    },
+    "app/assets/traces/digits_k16_b800_pso_s0.npz": {
+      "bytes": 12373,
+      "sha256": "6f3e7b0348bf9d1ccc75914ffa92a3e50d9c0da0809e99415db8aeab404da7f1"
+    }
+  }
+}

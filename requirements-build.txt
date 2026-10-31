@@ -1,0 +1,7 @@
+# Build-time only (experiments/day1/): reconstruct the Day-1 ResNet-18 embedding,
+# export it to ONNX and build the gallery.  The dashboard itself never imports
+# torch; at runtime it uses onnxruntime (requirements-app.txt).
+# CPU wheels:  pip install -r requirements-build.txt --index-url https://download.pytorch.org/whl/cpu
+# Lower bounds only (approved 2026-10-31); record the installed versions in LOG.md.
+torch>=2.5
+torchvision>=0.20

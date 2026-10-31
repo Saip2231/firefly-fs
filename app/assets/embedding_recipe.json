@@ -1,0 +1,37 @@
+{
+  "recipe": "imagenet_r256crop224",
+  "weights": "IMAGENET1K_V1",
+  "resize": "pil_crop",
+  "size": 224,
+  "norm": "imagenet",
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "post": "raw",
+  "output": "512-d global average pool (fc removed)",
+  "onnx_sha256": "34afe8677aaaa544d87eb293b201ad108fc7e0af59c555dcccb11a74a02b1ecd",
+  "classes": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ],
+  "torch_vs_onnx_max_abs_diff": 1.430511474609375e-05,
+  "found_in_stored_subset": 10,
+  "verdict": "APPROXIMATE",
+  "stored_median_rel": 0.02968333280071959,
+  "note": "reconstructed APPROXIMATELY: identifies rows of data/cifar_r18_X.npy with correct labels, but differs from the original features by stored_median_rel (relative); not bit-exact"
+}

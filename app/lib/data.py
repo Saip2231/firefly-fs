@@ -150,3 +150,43 @@ def primary_meta(dataset: str) -> pd.DataFrame:
 def read_text(path: Path) -> str | None:
     """A markdown/text file from the repo, or None if it does not exist."""
     return path.read_text(encoding="utf-8") if path.exists() else None
+
+
+def md_section(text: str | None, heading: str) -> str | None:
+    """Body of the '## heading' section of a markdown document (None if absent)."""
+    if not text:
+        return None
+    m = re.search(rf"^## {re.escape(heading)}\s*$(.*?)(?=^## |\Z)", text, re.M | re.S)
+    return m.group(1).strip() if m else None
+
+
+def parse_idx(value) -> frozenset[int]:
+    """'2,13,19' -> frozenset({2, 13, 19}); empty / NaN -> frozenset()."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return frozenset()
+    text = str(value).strip()
+    return frozenset(int(t) for t in text.split(",")) if text else frozenset()
+
+
+@st.cache_data(show_spinner=False, max_entries=4)
+def per_seed(dataset: str) -> pd.DataFrame:
+    """One row per (method, k, budget, seed) used in the primary analysis.
+
+    Baselines (canonical names, no budget, accuracy column `acc`) and meta
+    rows with mask_type == "raw" (`acc_lr`), as columns method, k, budget
+    (NaN for baselines), seed, acc_lr, idx, source.
+    """
+    from app.lib.methods import BASELINE_LABELS  # noqa: PLC0415
+
+    base = load_raw("baselines", dataset)
+    unknown = sorted(set(base["method"]) - set(BASELINE_LABELS))
+    if unknown:
+        raise DataError(f"baselines_{dataset}.csv: unknown method label(s) {unknown}.")
+    b = pd.DataFrame(dict(method=base["method"].map(BASELINE_LABELS), k=base["k"],
+                          budget=float("nan"), seed=base["seed"], acc_lr=base["acc"],
+                          idx=base["idx"], source="baseline"))
+    m = primary_meta(dataset)
+    m = pd.DataFrame(dict(method=m["method"], k=m["k"], budget=m["budget"].astype(float),
+                          seed=m["seed"], acc_lr=m["acc_lr"], idx=m["idx"],
+                          source="metaheuristic"))
+    return pd.concat([b, m], ignore_index=True)

@@ -38,6 +38,15 @@ def placeholder(stage: str, what: str) -> None:
             icon=":material/construction:")
 
 
+def exploratory(what: str) -> None:
+    """The label every exploratory panel carries (ANALYSIS.md rule 7)."""
+    st.caption(f":material/science: Exploratory, not corrected across families: {what}")
+
+
+def takeaway(text: str) -> None:
+    st.caption(f"**Takeaway:** {text}")
+
+
 def data_error(err: DataError) -> None:
     """Show a loader problem as one readable line instead of a stack trace."""
     st.error(f"Data problem: {err}", icon=":material/error:")

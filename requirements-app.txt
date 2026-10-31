@@ -11,3 +11,7 @@ joblib==1.6.0
 # pip refuses to install if they do not.  Record what pip picks in LOG.md.
 streamlit>=1.45
 plotly>=5.24
+# Stage B1/B7: ResNet-18 embedding at inference (approved 2026-10-31).  Not
+# yet installed; lower bounds only, record the installed versions in LOG.md.
+onnx>=1.16
+onnxruntime>=1.18

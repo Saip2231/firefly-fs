@@ -1,0 +1,93 @@
+dataset,method,display,source,k,budget,metric,n,mean,std
+cifar_r18,anova,ANOVA F,baseline (no budget),16,,acc,10,0.6063000000000001,0.0121796734128812
+cifar_r18,l1,L1 logistic,baseline (no budget),16,,acc,10,0.5856,0.013924000063838626
+cifar_r18,mi,Mutual information,baseline (no budget),16,,acc,10,0.55865,0.01528443289392474
+cifar_r18,pca,"PCA (projection, not a selector)",baseline (no budget),16,,acc,10,0.7618,0.006807675406806967
+cifar_r18,random,Random,baseline (no budget),16,,acc,10,0.47565,0.03625683843543632
+cifar_r18,rf,RF importance,baseline (no budget),16,,acc,10,0.6584,0.009740522459179333
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",16,800.0,acc_lr,10,0.5953999999999999,0.01956158366685981
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",16,800.0,acc_lr,10,0.6243000000000001,0.014279355727763067
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",16,800.0,acc_lr,10,0.58385,0.01831370161017883
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",16,800.0,acc_lr,10,0.623,0.010173494974687896
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",16,3000.0,acc_lr,10,0.63335,0.014905349524397093
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",16,3000.0,acc_lr,10,0.6294500000000001,0.024587090108428827
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",16,3000.0,acc_lr,10,0.5832499999999999,0.020299493699214393
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",16,3000.0,acc_lr,10,0.6287,0.016256964319604328
+cifar_r18,anova,ANOVA F,baseline (no budget),32,,acc,10,0.6896,0.012292273996295379
+cifar_r18,l1,L1 logistic,baseline (no budget),32,,acc,10,0.68825,0.014150480949816205
+cifar_r18,mi,Mutual information,baseline (no budget),32,,acc,10,0.6837,0.010031062866028801
+cifar_r18,pca,"PCA (projection, not a selector)",baseline (no budget),32,,acc,10,0.80335,0.007195870729491702
+cifar_r18,random,Random,baseline (no budget),32,,acc,10,0.62065,0.01682433753029616
+cifar_r18,rf,RF importance,baseline (no budget),32,,acc,10,0.72865,0.010036184533975034
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",32,800.0,acc_lr,10,0.67605,0.01460869223746223
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",32,800.0,acc_lr,10,0.69555,0.015711725981996175
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",32,800.0,acc_lr,10,0.67495,0.010174723583468987
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",32,800.0,acc_lr,10,0.68755,0.013444226352684727
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",32,3000.0,acc_lr,10,0.6950000000000001,0.013441230102437309
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",32,3000.0,acc_lr,10,0.7053,0.010886280866811742
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",32,3000.0,acc_lr,10,0.6738,0.01294904543886451
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",32,3000.0,acc_lr,10,0.6935,0.012897028081435407
+cifar_r18,anova,ANOVA F,baseline (no budget),64,,acc,10,0.76135,0.012965874011762146
+cifar_r18,l1,L1 logistic,baseline (no budget),64,,acc,10,0.76285,0.009865906502248615
+cifar_r18,mi,Mutual information,baseline (no budget),64,,acc,10,0.75345,0.012573009009602874
+cifar_r18,pca,"PCA (projection, not a selector)",baseline (no budget),64,,acc,10,0.8304500000000001,0.005663969946561832
+cifar_r18,random,Random,baseline (no budget),64,,acc,10,0.7310000000000001,0.010024968827881762
+cifar_r18,rf,RF importance,baseline (no budget),64,,acc,10,0.7762,0.008676917015212785
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",64,800.0,acc_lr,10,0.7449,0.010123679612121721
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",64,800.0,acc_lr,10,0.7619,0.010492854711659737
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",64,800.0,acc_lr,10,0.7409,0.008805932343848917
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",64,800.0,acc_lr,10,0.764,0.012836579675979802
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",64,3000.0,acc_lr,10,0.7542500000000001,0.008423676948538149
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",64,3000.0,acc_lr,10,0.7632,0.011612254063894944
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",64,3000.0,acc_lr,10,0.74995,0.008247726959593167
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",64,3000.0,acc_lr,10,0.7612,0.008253618734968446
+cifar_r18,anova,ANOVA F,baseline (no budget),128,,acc,10,0.80915,0.010354950506883133
+cifar_r18,l1,L1 logistic,baseline (no budget),128,,acc,10,0.7999,0.009305912099305544
+cifar_r18,mi,Mutual information,baseline (no budget),128,,acc,10,0.8029,0.012413702106946195
+cifar_r18,pca,"PCA (projection, not a selector)",baseline (no budget),128,,acc,10,0.82935,0.005343999750499007
+cifar_r18,random,Random,baseline (no budget),128,,acc,10,0.79135,0.011678684286625239
+cifar_r18,rf,RF importance,baseline (no budget),128,,acc,10,0.8088000000000001,0.008423512067751486
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",128,800.0,acc_lr,10,0.78905,0.006103050239201896
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",128,800.0,acc_lr,10,0.7964,0.008827985802737415
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",128,800.0,acc_lr,10,0.79505,0.009111805529092482
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",128,800.0,acc_lr,10,0.8006500000000001,0.010365675193745075
+cifar_r18,firefly,Firefly,"metaheuristic, raw mask",128,3000.0,acc_lr,10,0.7969,0.008432081593533139
+cifar_r18,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",128,3000.0,acc_lr,10,0.8036,0.00795403461563165
+cifar_r18,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",128,3000.0,acc_lr,10,0.79535,0.009144063040513722
+cifar_r18,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",128,3000.0,acc_lr,10,0.8004,0.006939420404872121
+cifar_r18,all,All features,baseline (no budget),512,,acc,10,0.8044499999999999,0.008989036532230675
+digits,anova,ANOVA F,baseline (no budget),16,,acc,10,0.9219444444444445,0.010912578161915631
+digits,l1,L1 logistic,baseline (no budget),16,,acc,10,0.9230555555555556,0.010959615354759498
+digits,mi,Mutual information,baseline (no budget),16,,acc,10,0.9133333333333333,0.008364140585656453
+digits,pca,"PCA (projection, not a selector)",baseline (no budget),16,,acc,10,0.9394444444444444,0.008861841565929956
+digits,random,Random,baseline (no budget),16,,acc,10,0.7777777777777778,0.058765302417120115
+digits,rf,RF importance,baseline (no budget),16,,acc,10,0.9222222222222223,0.013224867460264493
+digits,firefly,Firefly,"metaheuristic, raw mask",16,800.0,acc_lr,10,0.9272222222222222,0.01062194844422222
+digits,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",16,800.0,acc_lr,10,0.9266666666666665,0.011505351531117827
+digits,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",16,800.0,acc_lr,10,0.9091666666666667,0.014525532130571669
+digits,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",16,800.0,acc_lr,10,0.9266666666666665,0.014534382866924874
+digits,firefly,Firefly,"metaheuristic, raw mask",16,3000.0,acc_lr,10,0.9233333333333335,0.01604819558762467
+digits,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",16,3000.0,acc_lr,10,0.9238888888888889,0.01323782666715669
+digits,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",16,3000.0,acc_lr,10,0.9227777777777778,0.012199754882963399
+digits,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",16,3000.0,acc_lr,10,0.9261111111111111,0.01165343164633504
+digits,anova,ANOVA F,baseline (no budget),32,,acc,10,0.9577777777777777,0.011095668280700195
+digits,l1,L1 logistic,baseline (no budget),32,,acc,10,0.9641666666666667,0.009208192511445784
+digits,mi,Mutual information,baseline (no budget),32,,acc,10,0.9574999999999999,0.007527954305251075
+digits,pca,"PCA (projection, not a selector)",baseline (no budget),32,,acc,10,0.9586111111111111,0.00811968935866436
+digits,random,Random,baseline (no budget),32,,acc,10,0.9233333333333332,0.023137034369089593
+digits,rf,RF importance,baseline (no budget),32,,acc,10,0.9602777777777778,0.007640992976213994
+digits,firefly,Firefly,"metaheuristic, raw mask",32,800.0,acc_lr,10,0.9502777777777778,0.009838371451214458
+digits,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",32,800.0,acc_lr,10,0.951388888888889,0.007663400628354984
+digits,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",32,800.0,acc_lr,10,0.9383333333333332,0.011475506210984901
+digits,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",32,800.0,acc_lr,10,0.9552777777777777,0.009750839716222807
+digits,firefly,Firefly,"metaheuristic, raw mask",32,3000.0,acc_lr,10,0.9522222222222222,0.007834887333817129
+digits,firefly_seeded,"Firefly, filter-seeded","metaheuristic, raw mask",32,3000.0,acc_lr,10,0.9475,0.009392559002159821
+digits,pso,"PSO (random-key top-k, stall-swap)","metaheuristic, raw mask",32,3000.0,acc_lr,10,0.9463888888888888,0.011268179945612076
+digits,pso_seeded,"PSO, filter-seeded","metaheuristic, raw mask",32,3000.0,acc_lr,10,0.9547222222222222,0.008690888911301722
+digits,all,All features,baseline (no budget),64,,acc,10,0.9708333333333334,0.0069598594344318825
+digits,anova,ANOVA F,baseline (no budget),64,,acc,10,0.9708333333333334,0.0069598594344318825
+digits,l1,L1 logistic,baseline (no budget),64,,acc,10,0.9708333333333334,0.0069598594344318825
+digits,mi,Mutual information,baseline (no budget),64,,acc,10,0.9708333333333334,0.0069598594344318825
+digits,pca,"PCA (projection, not a selector)",baseline (no budget),64,,acc,10,0.9705555555555556,0.007196058973231623
+digits,random,Random,baseline (no budget),64,,acc,10,0.9708333333333334,0.0069598594344318825
+digits,rf,RF importance,baseline (no budget),64,,acc,10,0.9708333333333334,0.0069598594344318825

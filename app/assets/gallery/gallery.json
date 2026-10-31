@@ -1,0 +1,231 @@
+{
+  "source": "official CIFAR-10 test set (torchvision CIFAR10, train=False)",
+  "recipe": "imagenet_r256crop224",
+  "post": "raw",
+  "embeddings": "embeddings.npy rows are in the stored-feature space (post-processing applied)",
+  "classes": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ],
+  "rejected_as_stored": 0,
+  "images": [
+    {
+      "file": "00_airplane.png",
+      "label": 0,
+      "class_name": "airplane",
+      "cifar_test_index": 4667,
+      "nearest_stored_rel": 0.6290075425703667
+    },
+    {
+      "file": "01_airplane.png",
+      "label": 0,
+      "class_name": "airplane",
+      "cifar_test_index": 2102,
+      "nearest_stored_rel": 0.4114006961359396
+    },
+    {
+      "file": "02_airplane.png",
+      "label": 0,
+      "class_name": "airplane",
+      "cifar_test_index": 2248,
+      "nearest_stored_rel": 0.6364984339971661
+    },
+    {
+      "file": "03_automobile.png",
+      "label": 1,
+      "class_name": "automobile",
+      "cifar_test_index": 7480,
+      "nearest_stored_rel": 0.5020488608590031
+    },
+    {
+      "file": "04_automobile.png",
+      "label": 1,
+      "class_name": "automobile",
+      "cifar_test_index": 871,
+      "nearest_stored_rel": 0.4208788414830634
+    },
+    {
+      "file": "05_automobile.png",
+      "label": 1,
+      "class_name": "automobile",
+      "cifar_test_index": 2063,
+      "nearest_stored_rel": 0.4837536757951079
+    },
+    {
+      "file": "06_bird.png",
+      "label": 2,
+      "class_name": "bird",
+      "cifar_test_index": 748,
+      "nearest_stored_rel": 0.548896275993592
+    },
+    {
+      "file": "07_bird.png",
+      "label": 2,
+      "class_name": "bird",
+      "cifar_test_index": 353,
+      "nearest_stored_rel": 0.7339207824950986
+    },
+    {
+      "file": "08_bird.png",
+      "label": 2,
+      "class_name": "bird",
+      "cifar_test_index": 249,
+      "nearest_stored_rel": 0.6574012788604818
+    },
+    {
+      "file": "09_cat.png",
+      "label": 3,
+      "class_name": "cat",
+      "cifar_test_index": 9302,
+      "nearest_stored_rel": 0.7215552203133534
+    },
+    {
+      "file": "10_cat.png",
+      "label": 3,
+      "class_name": "cat",
+      "cifar_test_index": 7401,
+      "nearest_stored_rel": 0.7747560070000249
+    },
+    {
+      "file": "11_cat.png",
+      "label": 3,
+      "class_name": "cat",
+      "cifar_test_index": 3035,
+      "nearest_stored_rel": 0.5845167217467531
+    },
+    {
+      "file": "12_deer.png",
+      "label": 4,
+      "class_name": "deer",
+      "cifar_test_index": 2510,
+      "nearest_stored_rel": 0.28040619187421767
+    },
+    {
+      "file": "13_deer.png",
+      "label": 4,
+      "class_name": "deer",
+      "cifar_test_index": 793,
+      "nearest_stored_rel": 0.5195349012584007
+    },
+    {
+      "file": "14_deer.png",
+      "label": 4,
+      "class_name": "deer",
+      "cifar_test_index": 8456,
+      "nearest_stored_rel": 0.5655748875637908
+    },
+    {
+      "file": "15_dog.png",
+      "label": 5,
+      "class_name": "dog",
+      "cifar_test_index": 1976,
+      "nearest_stored_rel": 0.4895871412837825
+    },
+    {
+      "file": "16_dog.png",
+      "label": 5,
+      "class_name": "dog",
+      "cifar_test_index": 2755,
+      "nearest_stored_rel": 0.5628852075243583
+    },
+    {
+      "file": "17_dog.png",
+      "label": 5,
+      "class_name": "dog",
+      "cifar_test_index": 2316,
+      "nearest_stored_rel": 0.6648963582106008
+    },
+    {
+      "file": "18_frog.png",
+      "label": 6,
+      "class_name": "frog",
+      "cifar_test_index": 8544,
+      "nearest_stored_rel": 0.5444233080713483
+    },
+    {
+      "file": "19_frog.png",
+      "label": 6,
+      "class_name": "frog",
+      "cifar_test_index": 5743,
+      "nearest_stored_rel": 0.6509228245544941
+    },
+    {
+      "file": "20_frog.png",
+      "label": 6,
+      "class_name": "frog",
+      "cifar_test_index": 8113,
+      "nearest_stored_rel": 0.5616334008176824
+    },
+    {
+      "file": "21_horse.png",
+      "label": 7,
+      "class_name": "horse",
+      "cifar_test_index": 8335,
+      "nearest_stored_rel": 0.6184067274914367
+    },
+    {
+      "file": "22_horse.png",
+      "label": 7,
+      "class_name": "horse",
+      "cifar_test_index": 2682,
+      "nearest_stored_rel": 0.47077867686455627
+    },
+    {
+      "file": "23_horse.png",
+      "label": 7,
+      "class_name": "horse",
+      "cifar_test_index": 4924,
+      "nearest_stored_rel": 0.6617111634959727
+    },
+    {
+      "file": "24_ship.png",
+      "label": 8,
+      "class_name": "ship",
+      "cifar_test_index": 9000,
+      "nearest_stored_rel": 0.531137523501609
+    },
+    {
+      "file": "25_ship.png",
+      "label": 8,
+      "class_name": "ship",
+      "cifar_test_index": 9054,
+      "nearest_stored_rel": 0.5265231022449879
+    },
+    {
+      "file": "26_ship.png",
+      "label": 8,
+      "class_name": "ship",
+      "cifar_test_index": 1860,
+      "nearest_stored_rel": 0.5462129265800606
+    },
+    {
+      "file": "27_truck.png",
+      "label": 9,
+      "class_name": "truck",
+      "cifar_test_index": 3253,
+      "nearest_stored_rel": 0.48377753906570997
+    },
+    {
+      "file": "28_truck.png",
+      "label": 9,
+      "class_name": "truck",
+      "cifar_test_index": 9133,
+      "nearest_stored_rel": 0.5529428814326766
+    },
+    {
+      "file": "29_truck.png",
+      "label": 9,
+      "class_name": "truck",
+      "cifar_test_index": 981,
+      "nearest_stored_rel": 0.4559382766328685
+    }
+  ]
+}

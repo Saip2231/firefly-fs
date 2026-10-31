@@ -187,8 +187,11 @@ def test_no_test_split_names_under_app():
 
 
 def test_no_file_over_400_lines():
+    """Rule 10 is about source structure; generated files in app/assets/
+    (facts.json, table copies) are data, not code, and are excluded."""
     long = {p.relative_to(ROOT).as_posix(): n for p in _app_text_files()
-            if (n := len(p.read_text(encoding="utf-8").splitlines())) > 400}
+            if "assets" not in p.relative_to(APP).parts
+            and (n := len(p.read_text(encoding="utf-8").splitlines())) > 400}
     assert not long
 
 

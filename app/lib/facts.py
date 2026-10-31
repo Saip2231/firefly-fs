@@ -78,11 +78,72 @@ def rq1_shape(rq1: pd.DataFrame) -> dict[str, int]:
             "comparators": int(rq1["comparator"].nunique())}
 
 
+def min_two_sided_p(n: int) -> float:
+    """Smallest two-sided exact Wilcoxon signed-rank p with n non-zero pairs."""
+    return 2.0 / 2 ** n
+
+
+def rq1_verdict(rq1: pd.DataFrame) -> list[str]:
+    """Verdict sentences, every number taken from rq1_tests.csv."""
+    from app.lib.methods import display  # noqa: PLC0415
+    from app.lib.stats_view import format_p  # noqa: PLC0415
+
+    c = rq1_label_counts(rq1)
+    shape = rq1_shape(rq1)
+    n = int(rq1["n"].max())
+    lines = [
+        f"Of {shape['tests']} pre-registered comparisons (plain Firefly against "
+        f"{shape['comparators']} comparators in {shape['families']} dataset x k x budget "
+        f"families), {c['WIN']} are WIN, {c['LOSS']} LOSS and {c['TIE']} TIE "
+        f"(paired Wilcoxon over n={n} seeds, Holm within each family, adjusted p < 0.05)."]
+    wins = rq1[rq1["label"] == "WIN"]
+    if len(wins):
+        lines.append("WIN: " + "; ".join(
+            f"{r.dataset} k={r.k} budget {r.budget} vs {display(r.comparator)} "
+            f"({r.mean_diff_pts:+.2f} pts, adjusted p {format_p(r.p_holm)})"
+            for r in wins.itertuples()) + ".")
+    losses = rq1[rq1["label"] == "LOSS"]["comparator"].value_counts()
+    if len(losses):
+        lines.append("LOSS by comparator: " + ", ".join(
+            f"{display(m)} {v}" for m, v in losses.items()) + ".")
+    lines.append(
+        f"With n={n} the smallest possible two-sided p is {min_two_sided_p(n):.4f}, so a "
+        "label needs nearly every seed to agree; TIE means no detectable difference, "
+        "not equivalence.")
+    return lines
+
+
+def top_method_per_k(desc: pd.DataFrame, dataset: str, budget: int) -> pd.DataFrame:
+    """Highest-mean method at each k (baselines plus raw meta rows at `budget`),
+    excluding 'all' (it has k = d)."""
+    d = desc[(desc["dataset"] == dataset) & (desc["method"] != "all")
+             & desc["metric"].isin(["acc", "acc_lr"])]
+    d = d[d["budget"].isna() | (d["budget"] == budget)]
+    d = d[d["source"].str.contains("raw") | d["source"].str.startswith("baseline")]
+    idx = d.groupby("k")["mean"].idxmax()
+    return d.loc[idx, ["k", "method", "mean", "std"]].sort_values("k")
+
+
 def integrity_status() -> IntegrityStatus:
     text = data.read_text(data.INTEGRITY)
     if text is None:
         return IntegrityStatus("MISSING", "", "unknown", ())
     return parse_integrity(text)
+
+
+def asset_facts() -> dict:
+    """app/assets/facts.json (built by experiments/build_app_assets.py), or {}."""
+    import json  # noqa: PLC0415
+
+    text = data.read_text(data.ASSETS / "facts.json")
+    return json.loads(text) if text else {}
+
+
+def contention_factor() -> float | None:
+    """A4's load-inflation factor (logged search time / idle search time)."""
+    text = data.read_text(data.ANALYSIS / "contention_factor.md")
+    m = re.search(r"contention_factor\s*=\s*([0-9.]+)", text or "")
+    return float(m.group(1)) if m else None
 
 
 def raw_row_counts() -> dict[str, int]:
