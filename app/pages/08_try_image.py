@@ -93,7 +93,7 @@ else:
 
 st.subheader("Preprocessing")
 steps.append(("What the network sees: Resize(256), CenterCrop(224)", upscaled_view(img32, recipe)))
-for col, (caption, arr) in zip(st.columns(len(steps)), steps):
+for col, (caption, arr) in zip(st.columns(4), steps):   # fixed width: no wide gaps
     shown = Image.fromarray(arr)
     if shown.size[0] <= 32:
         shown = shown.resize((160, 160), Image.NEAREST)   # crisp pixels

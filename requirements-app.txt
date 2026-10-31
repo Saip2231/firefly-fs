@@ -1,17 +1,15 @@
-# Dashboard dependencies (app/streamlit_app.py), on top of the benchmark venv.
-# Core libraries are pinned to the versions the benchmark ran with, so the
-# dashboard computes exactly what the runners computed.
+# Dashboard runtime dependencies (app/streamlit_app.py), pinned to the versions
+# installed in the project venv (read from .venv site-packages, 2026-10-31).
+# Core libraries match the versions the benchmark ran with, so live searches
+# and replays compute exactly what the runners computed.
 numpy==2.4.6
 pandas==3.1.0
 scikit-learn==1.9.1
 scipy==1.17.1
 joblib==1.6.0
-# Not yet installed in the venv; lower bounds only (exact current versions
-# were not verified here).  The installed versions must accept pandas 3.x;
-# pip refuses to install if they do not.  Record what pip picks in LOG.md.
-streamlit>=1.45
-plotly>=5.24
-# Stage B1/B7: ResNet-18 embedding at inference (approved 2026-10-31).  Not
-# yet installed; lower bounds only, record the installed versions in LOG.md.
-onnx>=1.16
-onnxruntime>=1.18
+threadpoolctl==3.7.0
+streamlit==1.66.1
+plotly==7.1.0
+pillow==13.0.0
+# Stage B7: ResNet-18 embedding at inference (approved 2026-10-31).
+onnxruntime==1.31.1
