@@ -21,7 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "dist" / "space"
-SKIP = shutil.ignore_patterns("__pycache__", "*.pyc", ".pytest_cache")
+SKIP = shutil.ignore_patterns("__pycache__", "*.pyc", ".pytest_cache", "node_modules")
 
 TREES = ["app", "src", "experiments/app_assets", "results/analysis"]
 FILES = ["PREREG.md", ".streamlit/config.toml", "results/split_hashes.csv"] + [

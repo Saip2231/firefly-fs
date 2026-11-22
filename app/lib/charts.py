@@ -19,9 +19,27 @@ LABEL_Y = "test accuracy (mean ± std over seeds)"
 
 
 def _fig(**layout) -> go.Figure:
+    """Empty figure with explicit, high-contrast text colours for the current
+    theme (layout-level values win over Streamlit's chart theme)."""
+    c = theme.chart_text()
+    title = layout.pop("title", None)
     fig = go.Figure()
-    fig.update_layout(template=theme.plotly_template(), margin=dict(l=10, r=10, t=50, b=10),
-                      legend=dict(orientation="h", y=-0.2), **layout)
+    fig.update_layout(
+        template=theme.plotly_template(), margin=dict(l=10, r=10, t=56, b=10),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family=theme.FONTS["body"], size=14, color=c["text"]),
+        title=dict(text=title, font=dict(family=theme.FONTS["heading"], size=17,
+                                         color=c["text"])),
+        legend=dict(orientation="h", y=-0.22, font=dict(size=13, color=c["text"]),
+                    bgcolor="rgba(0,0,0,0)"),
+        hoverlabel=dict(bgcolor=c["card"], bordercolor=c["border"],
+                        font=dict(family=theme.FONTS["mono"], size=13, color=c["text"])),
+        **layout)
+    axis = dict(gridcolor=c["grid"], zerolinecolor=c["grid"], linecolor=c["grid"],
+                tickfont=dict(family=theme.FONTS["mono"], size=12.5, color=c["text"]),
+                title_font=dict(size=14, color=c["text"]))
+    fig.update_xaxes(**axis)
+    fig.update_yaxes(**axis)
     return fig
 
 
@@ -82,7 +100,7 @@ def seed_diffs(diffs: pd.DataFrame, comparator: str) -> go.Figure:
                          marker_color=colours, text=[f"{v:+.2f}" for v in diffs["diff_pts"]],
                          textposition="outside", name="difference",
                          hovertemplate="seed %{x}: %{y:+.2f} pts<extra></extra>"))
-    fig.add_hline(y=0, line_color=theme.SURFACES["dark"]["muted"])
+    fig.add_hline(y=0, line_color=theme.REFERENCE_LINE)
     return fig
 
 
@@ -90,16 +108,21 @@ def cost_scatter(cost: pd.DataFrame, title: str) -> go.Figure:
     """Accuracy vs search time (log x), one point per method (and budget)."""
     fig = _fig(title=title, xaxis_title="search time, s (log; measured under 15-way "
                "parallel load)", yaxis_title="test accuracy (mean over seeds)")
+    # Budget is a marker shape (first budget circle, second square), not an
+    # overlapping text label; it is also in the legend entry and the hover.
+    budgets = sorted(int(b) for b in cost["budget"].dropna().unique())
+    shapes = dict(zip(budgets, ("circle", "square", "triangle-up", "x")))
     for method in sorted(cost["method"].unique(), key=sort_key):
         d = cost[cost["method"] == method]
-        lab = [f"b={int(b)}" if pd.notna(b) else "" for b in d["budget"]]
-        fig.add_trace(go.Scatter(
-            x=d["search_s_mean"].clip(lower=1e-3), y=d["acc_mean"], mode="markers+text",
-            text=lab, textposition="top center", name=display(method),
-            marker=dict(size=12, color=theme.method_colour(method),
-                        symbol="diamond" if method == "pca" else "circle"),
-            hovertemplate="%{x:.2f} s, accuracy %{y:.3f} %{text}<extra>"
-                          + display(method) + "</extra>"))
+        for b, g in d.groupby(d["budget"].fillna(-1), sort=True):
+            budget = None if b == -1 else int(b)
+            name = display(method) + (f" · budget {budget}" if budget else "")
+            symbol = "diamond" if method == "pca" else shapes.get(budget, "circle")
+            fig.add_trace(go.Scatter(
+                x=g["search_s_mean"].clip(lower=1e-3), y=g["acc_mean"], mode="markers",
+                name=name, marker=dict(size=13, color=theme.method_colour(method),
+                                       symbol=symbol, line=dict(width=1, color="rgba(0,0,0,0.35)")),
+                hovertemplate="%{x:.2f} s, accuracy %{y:.3f}<extra>" + name + "</extra>"))
     fig.update_xaxes(type="log")
     return fig
 
@@ -116,7 +139,7 @@ def bars_with_reference(df: pd.DataFrame, value: str, err: str | None, title: st
         hovertemplate="%{x}: %{y:.3f}<extra></extra>"))
     for i, (name, y) in enumerate((refs or {}).items()):
         fig.add_hline(y=y, line_dash="dash" if i == 0 else "dot",
-                      line_color=theme.SURFACES["dark"]["muted"], annotation_text=name)
+                      line_color=theme.REFERENCE_LINE, annotation_text=name)
     return fig
 
 
@@ -130,7 +153,7 @@ def diff_bars(df: pd.DataFrame, title: str) -> go.Figure:
         marker_color=[theme.method_colour(m) for m in df["method"]],
         text=[f"{v:+.2f}" for v in df["mean_diff_pts"]], textposition="outside",
         hovertemplate="%{y}: %{x:+.2f} pts<extra></extra>"))
-    fig.add_vline(x=0, line_color=theme.SURFACES["dark"]["muted"])
+    fig.add_vline(x=0, line_color=theme.REFERENCE_LINE)
     fig.update_yaxes(autorange="reversed")
     return fig
 
@@ -141,7 +164,7 @@ def pixel_grid(values: np.ndarray, title: str, zmax: float | None = None) -> go.
     fig = _fig(title=title, height=360, width=360)
     fig.add_trace(go.Heatmap(
         z=z, zmin=0, zmax=zmax if zmax is not None else max(1.0, float(z.max())),
-        colorscale=[[0, theme.SURFACES["dark"]["card"]], [1, theme.ACCENT]],
+        colorscale=theme.heat_scale(),
         text=[[f"{v:g}" for v in row] for row in z], texttemplate="%{text}",
         showscale=False, hovertemplate="row %{y}, col %{x}: %{z:g}<extra></extra>"))
     fig.update_yaxes(autorange="reversed", showgrid=False, scaleanchor="x")
@@ -164,8 +187,7 @@ def population(pop: np.ndarray, values: np.ndarray, title: str) -> go.Figure:
                xaxis_title="feature index", yaxis_title="member")
     fig.add_trace(go.Heatmap(
         z=z, zmin=0, zmax=1, showscale=False,
-        colorscale=[[0, theme.SURFACES["dark"]["background"]], [0.01, "#5A4100"],
-                    [1, theme.ACCENT]],
+        colorscale=theme.heat_scale(gap=True),
         customdata=np.repeat(v[:, None], pop.shape[1], axis=1),
         hovertemplate="member %{y}, feature %{x}<br>fitness %{customdata:.4f}<extra></extra>"))
     fig.update_yaxes(autorange="reversed")
@@ -182,11 +204,11 @@ def embedding_strip(emb: np.ndarray, idx: np.ndarray | None, title: str) -> go.F
     fig = _fig(title=title, xaxis_title="embedding dimension", yaxis_title="activation",
                height=280, bargap=0)
     fig.add_trace(go.Bar(x=x[~sel], y=emb[~sel], name="not used by this method",
-                         marker_color=theme.SURFACES["dark"]["muted"],
+                         marker_color=theme.REFERENCE_LINE,
                          hovertemplate="dim %{x}: %{y:.2f}<extra></extra>"))
     if sel.any():
         fig.add_trace(go.Bar(x=x[sel], y=emb[sel], name="used by this method",
-                             marker_color=theme.ACCENT,
+                             marker_color=theme.chart_accent(),
                              hovertemplate="dim %{x} (used): %{y:.2f}<extra></extra>"))
     return fig
 
@@ -203,6 +225,6 @@ def fitness_curves(curves: dict[str, pd.DataFrame], marker: tuple[str, float, fl
     if marker:
         name, x, y = marker
         fig.add_trace(go.Scatter(x=[x], y=[y], mode="markers", name=f"{name}: current frame",
-                                 marker=dict(size=14, symbol="star", color=theme.ACCENT,
+                                 marker=dict(size=14, symbol="star", color=theme.chart_accent(),
                                              line=dict(color="#FFFFFF", width=1))))
     return fig

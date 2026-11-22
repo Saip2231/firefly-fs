@@ -30,12 +30,18 @@ from app.lib import data, facts, stats_view, theme  # noqa: E402
 from app.lib.navigation import PAGE_SPECS  # noqa: E402
 
 TIMEOUT = 30
-TEXT_SUFFIXES = {".py", ".md", ".toml", ".txt", ".json", ".css", ".html", ".js"}
+TEXT_SUFFIXES = {".py", ".md", ".toml", ".txt", ".json", ".css", ".html", ".js", ".ts",
+                 ".tsx"}
+# Third-party and tool-generated files under app/frontend (npm install) are
+# not project source.
+SKIP_PARTS = {"__pycache__", "node_modules"}
+SKIP_NAMES = {"package-lock.json"}
 
 
 def _app_text_files():
     return [p for p in APP.rglob("*")
-            if p.is_file() and p.suffix in TEXT_SUFFIXES and "__pycache__" not in p.parts]
+            if p.is_file() and p.suffix in TEXT_SUFFIXES and p.name not in SKIP_NAMES
+            and not SKIP_PARTS & set(p.parts)]
 
 
 # (a) -----------------------------------------------------------------------
@@ -226,3 +232,54 @@ def test_plotly_template_builds():
     pytest.importorskip("plotly")
     tpl = theme.plotly_template()
     assert tpl.layout.paper_bgcolor == "rgba(0,0,0,0)"
+
+
+@pytest.mark.parametrize("mode", theme.MODES)
+def test_theme_pairs_meet_wcag_aa(mode):
+    """Text pairs need 4.5:1; accent fills and strokes (non-text) need 3:1."""
+    t = theme.TOKENS[mode]
+    for bg in ("background", "card"):
+        for fg in ("text", "muted", "accent_text"):
+            assert theme.contrast(t[fg], t[bg]) >= 4.5, (mode, fg, bg)
+        assert theme.contrast(t["accent"], t[bg]) >= 3.0, (mode, "accent", bg)
+    assert theme.contrast(t["on_accent"], t["accent"]) >= 4.5, (mode, "on_accent")
+    # accent_hover is used for borders and strokes only (3:1); light #D14B1A
+    # carries neither navy (3.6:1) nor white (4.4:1) text at AA.
+    assert theme.contrast(t["accent_hover"], t["background"]) >= 3.0, (mode, "hover")
+
+
+def test_theme_toggle_matches_streamlit_storage_key():
+    """The pill writes Streamlit's own theme cache; fail loudly if an upgrade
+    changes the key format (then update THEME_STORAGE_PREFIX / VERSION)."""
+    import streamlit  # noqa: PLC0415
+    js_dir = Path(streamlit.__file__).parent / "static" / "static" / "js"
+    bundles = [p.read_text(encoding="utf-8", errors="ignore") for p in js_dir.glob("utils.*.js")]
+    if not bundles:
+        pytest.skip("Streamlit frontend bundle not found")
+    src = "\n".join(bundles)
+    assert f"{theme.THEME_STORAGE_PREFIX}${{window.location.pathname}}" in src
+    assert f"CACHED_THEME_VERSION:{theme.THEME_CACHE_VERSION}" in src or \
+        re.search(rf"\w+={theme.THEME_CACHE_VERSION},\w+=`{theme.THEME_STORAGE_PREFIX}", src)
+    assert "`Light`" in src and "`Dark`" in src
+
+
+def test_streamlit_config_mirrors_tokens():
+    import tomllib  # noqa: PLC0415
+    cfg = tomllib.loads((ROOT / ".streamlit" / "config.toml").read_text(encoding="utf-8"))
+    for mode in theme.MODES:
+        section, t = cfg["theme"][mode], theme.TOKENS[mode]
+        assert section["backgroundColor"] == t["background"], mode
+        assert section["secondaryBackgroundColor"] == t["card"], mode
+        assert section["textColor"] == t["text"], mode
+        assert section["primaryColor"] == t["accent"], mode
+        assert section["linkColor"] == t["accent_text"], mode
+
+
+def test_page_head_has_both_themes_and_sync():
+    head = theme.page_head()
+    assert ':root[data-ff-theme="light"]' in head and ':root[data-ff-theme="dark"]' in head
+    assert "__ffThemeSync" in head and "ff-theme-pill" in head
+    assert "__PREFIX__" not in head and "__TOGGLE__" not in head and "__VER__" not in head
+    assert f"-v{theme.THEME_CACHE_VERSION}" in head and "location.reload" in head
+    for mode in theme.MODES:
+        assert theme.TOKENS[mode]["background"] in head

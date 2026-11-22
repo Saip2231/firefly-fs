@@ -1,11 +1,55 @@
-# Base theme for app/streamlit_app.py; tokens mirror app/lib/theme.py.
+# Light and dark themes for app/streamlit_app.py; tokens mirror app/lib/theme.py.
+# With both sections defined, Streamlit follows the system setting on first
+# visit, and the choice in the app menu (⋮ → Settings → Theme) persists in the
+# browser.
 [theme]
-base = "dark"
-primaryColor = "#E69F00"
-backgroundColor = "#0E1117"
-secondaryBackgroundColor = "#161B22"
-textColor = "#E6EDF3"
-font = "sans serif"
+# Self-hosted fonts (app/static/fonts/, copied by `npm run build` in
+# app/frontend). If the files are missing the browser falls back to the next
+# family in each list.
+font = "Plus Jakarta Sans, system-ui, sans-serif"
+headingFont = "Sora, system-ui, sans-serif"
+codeFont = "JetBrains Mono, ui-monospace, monospace"
+baseRadius = "0.75rem"
+buttonRadius = "full"
+
+[[theme.fontFaces]]
+family = "Plus Jakarta Sans"
+url = "app/static/fonts/plus-jakarta-sans.woff2"
+weight = "200 800"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Sora"
+url = "app/static/fonts/sora.woff2"
+weight = "100 800"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "app/static/fonts/jetbrains-mono.woff2"
+weight = "100 800"
+style = "normal"
+
+[theme.light]
+primaryColor = "#E85D2A"
+backgroundColor = "#F6F1E7"
+secondaryBackgroundColor = "#FCF9F2"
+textColor = "#132238"
+linkColor = "#B4441A"
+borderColor = "#E4DCCB"
+codeBackgroundColor = "#EFE7D6"
+
+[theme.dark]
+primaryColor = "#05979C"
+backgroundColor = "#080A0C"
+secondaryBackgroundColor = "#111518"
+textColor = "#F1F5F6"
+linkColor = "#5BA8AB"
+borderColor = "#172629"
+codeBackgroundColor = "#141B1E"
+
+[server]
+enableStaticServing = true
 
 [client]
 toolbarMode = "minimal"

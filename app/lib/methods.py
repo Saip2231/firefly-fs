@@ -30,6 +30,8 @@ DATASET_DISPLAY = {
     "digits": "Digits (64 pixels)",
     "cifar_r18": "CIFAR-10 subset, ResNet-18 embeddings (512-d)",
 }
+# Short labels for controls (segmented buttons); the full name stays in titles.
+DATASET_SHORT = {"digits": "Digits", "cifar_r18": "CIFAR-10 (ResNet-18)"}
 
 
 def display(method: str) -> str:

@@ -5,21 +5,18 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+from app.components.bento import card, hero, row
 from app.components.callout import takeaway
 from app.components.frame_player import frame_player
 from app.lib import charts, search_live
 from app.lib.methods import display
 
-st.title("Digits live and build your own")
-st.markdown(
-    "Run a small, capped search live on the Digits training split and score it on a "
-    "holdout carved from that training split.")
-st.caption(f"Caps: at most {search_live.MAX_EVALS} evaluations and "
-           f"{search_live.MAX_SECONDS:.0f} s per run, one thread. Clicking any control "
-           "while a run is in progress (Stop included) stops it.")
+hero("Digits live and build your own",
+     "Run a small, capped search live on the Digits training split and score it on a "
+     "holdout carved from that training split.",
+     eyebrow="🧪 Playground")
 
 MODES = ["Digits live", "Build your own"]
-mode = st.segmented_control("Mode", MODES, default=MODES[0], key="dl_mode") or MODES[0]
 
 
 @st.cache_data(show_spinner=False)
@@ -36,21 +33,26 @@ def run_search(split: dict, k: int, n_pop: int, budget: int, alpha: float, seed:
     return res
 
 
-def overfitting_meter(res: dict) -> None:
+def overfitting_meter(res: dict, mode: str) -> None:
     df = pd.DataFrame(dict(
         name=["Firefly: inner validation", "Firefly: holdout",
               "ANOVA: inner validation", "ANOVA: holdout"],
         method=["firefly", "firefly", "anova", "anova"],
         acc=[res["val_acc"], res["holdout_acc"], res["anova_val_acc"],
              res["anova_holdout_acc"]]))
-    st.plotly_chart(charts.bars_with_reference(
-        df, "acc", None, "Overfitting meter: inner validation vs holdout accuracy",
-        "accuracy"), key=f"dl_meter_{mode}")
     gap = res["val_acc"] - res["holdout_acc"]
-    takeaway(f"Firefly's subset scores {res['val_acc']:.3f} on the inner validation rows "
-             f"it was chosen on and {res['holdout_acc']:.3f} on the unseen holdout "
-             f"({gap * 100:+.1f} pts gap); ANOVA at the same k scores "
-             f"{res['anova_holdout_acc']:.3f} on the holdout. One run, one seed.")
+    with card("meter", "Overfitting meter", eyebrow="Inner validation vs holdout · one run"):
+        st.plotly_chart(charts.bars_with_reference(df, "acc", None, "accuracy by split",
+                                                   "accuracy"), key=f"dl_meter_{mode}")
+        m = row(4)
+        m[0].metric("Firefly, inner validation", f"{res['val_acc']:.3f}", border=True)
+        m[1].metric("Firefly, holdout", f"{res['holdout_acc']:.3f}", border=True)
+        m[2].metric("Gap", f"{gap * 100:+.1f} pts", border=True)
+        m[3].metric("ANOVA, holdout", f"{res['anova_holdout_acc']:.3f}", border=True)
+        takeaway(f"Firefly's subset scores {res['val_acc']:.3f} on the inner validation rows "
+                 f"it was chosen on and {res['holdout_acc']:.3f} on the unseen holdout "
+                 f"({gap * 100:+.1f} pts gap); ANOVA at the same k scores "
+                 f"{res['anova_holdout_acc']:.3f} on the holdout. One run, one seed.")
 
 
 def frames_view(res: dict, key: str) -> None:
@@ -66,76 +68,96 @@ def frames_view(res: dict, key: str) -> None:
     frame_player(len(frames), key, render)
 
 
+with card("mode", "Mode", eyebrow="Controls"):
+    c1, c2 = row([1, 1.618])
+    mode = c1.segmented_control("Mode", MODES, default=MODES[0], key="dl_mode") or MODES[0]
+    c2.caption(f"Caps: at most {search_live.MAX_EVALS} evaluations and "
+               f"{search_live.MAX_SECONDS:.0f} s per run, one thread. Clicking any control "
+               "while a run is in progress (Stop included) stops it.")
+
+res = None
 if mode == "Digits live":
     split = digits()
     ex = split["examples"]
-    c1, c2, c3 = st.columns(3)
-    pick = c1.selectbox("Digit to classify (from the holdout)", list(range(len(ex))),
-                        format_func=lambda i: f"Example {i + 1}: a {int(split['y'][ex[i]])}",
-                        key="dl_pick")
-    k = c2.slider("k (pixels kept)", 4, 48, 16, key="dl_k")
-    budget = c3.slider("Budget (evaluations)", 30, search_live.MAX_EVALS, 150, step=10,
-                       key="dl_budget")
+    with card("settings", "Settings", eyebrow="Search"):
+        c1, c2, c3, c4 = row([1.4, 1, 1, 0.9])
+        pick = c1.selectbox("Digit to classify (from the holdout)", list(range(len(ex))),
+                            format_func=lambda i: f"Example {i + 1}: a {int(split['y'][ex[i]])}",
+                            key="dl_pick")
+        k = c2.slider("k (pixels kept)", 4, 48, 16, key="dl_k")
+        budget = c3.slider("Budget (evaluations)", 30, search_live.MAX_EVALS, 150, step=10,
+                           key="dl_budget")
+        go = c4.button("Run live search", type="primary", icon=":material/play_arrow:")
+        if go:
+            st.session_state["dl_res"] = (k, budget, run_search(split, k, 10, budget, 0.02, 0))
     x = split["X"][ex[pick]]
-    st.plotly_chart(charts.pixel_grid(x, "The digit (8x8 pixel intensities)", zmax=16),
-                    key="dl_digit")
-    if st.button("Run live search", type="primary", icon=":material/play_arrow:"):
-        st.session_state["dl_res"] = (k, budget, run_search(split, k, 10, budget, 0.02, 0))
     saved = st.session_state.get("dl_res")
-    if saved and saved[:2] == (k, budget):
-        res = saved[2]
-        if res["stopped"]:
-            st.warning(res["stopped"])
-        st.markdown(f"Used {res['evals']} of {res['budget']} evaluations in "
-                    f"{res['seconds']:.1f} s (seed 0).")
-        frames_view(res, "dl_frames")
-        label, proba = search_live.predict(res, x)
-        st.metric("Prediction with the selected pixels",
-                  f"{label} ({proba.max():.0%})",
-                  help=f"true label {int(split['y'][ex[pick]])}")
-        st.caption(f"One digit is an anecdote. The holdout accuracy below comes from "
-                   f"{len(split['holdout'])} held-out training digits.")
-        overfitting_meter(res)
-    elif saved:
-        st.info("Settings changed; run the search again.")
+    with card("digit", "The digit and its selected pixels", eyebrow="✨ Live"):
+        left, right = row([1, 1.618])
+        left.plotly_chart(charts.pixel_grid(x, "8x8 pixel intensities", zmax=16),
+                          key="dl_digit")
+        with right:
+            if saved and saved[:2] == (k, budget):
+                res = saved[2]
+                if res["stopped"]:
+                    st.warning(res["stopped"])
+                st.markdown(f"Used {res['evals']} of {res['budget']} evaluations in "
+                            f"{res['seconds']:.1f} s (seed 0).")
+                frames_view(res, "dl_frames")
+            elif saved:
+                st.info("Settings changed; run the search again.")
+            else:
+                st.info("Press Run live search to start.", icon=":material/play_arrow:")
+        if res is not None:
+            label, proba = search_live.predict(res, x)
+            st.metric("Prediction with the selected pixels", f"{label} ({proba.max():.0%})",
+                      help=f"true label {int(split['y'][ex[pick]])}", border=True)
+            st.caption(f"One digit is an anecdote. The holdout accuracy below comes from "
+                       f"{len(split['holdout'])} held-out training digits.")
 else:
-    c1, c2, c3 = st.columns(3)
-    source = c1.segmented_control("Data", ["digits", "toy"], default="digits",
-                                  format_func={"digits": "Digits training split",
-                                               "toy": "Planted toy"}.get,
-                                  key="by_src") or "digits"
-    seed = int(c2.number_input("Seed", 0, 99, 0, key="by_seed"))
-    split = digits() if source == "digits" else search_live.toy_split(seed)
-    d = split["X"].shape[1]
-    k = c3.slider("k", 2, d // 2, min(16, d // 4), key=f"by_k_{source}")
-    c1, c2, c3 = st.columns(3)
-    n_pop = c1.slider("Population (fireflies)", 4, 30, 10, key="by_pop")
-    budget = c2.slider("Budget (evaluations)", 30, search_live.MAX_EVALS, 200, step=10,
-                       key="by_budget")
-    alpha = c3.slider("alpha (mutation scale)", 0.0, 0.5, 0.02, step=0.01, key="by_alpha")
-    params = (source, seed, k, n_pop, budget, alpha)
-    if st.button("Run search", type="primary", icon=":material/play_arrow:"):
-        st.session_state["by_res"] = (params, run_search(split, k, n_pop, budget, alpha, seed))
+    with card("settings", "Settings", eyebrow="Search"):
+        c1, c2, c3 = row(3)
+        source = c1.segmented_control("Data", ["digits", "toy"], default="digits",
+                                      format_func={"digits": "Digits training split",
+                                                   "toy": "Planted toy"}.get,
+                                      key="by_src") or "digits"
+        seed = int(c2.number_input("Seed", 0, 99, 0, key="by_seed"))
+        split = digits() if source == "digits" else search_live.toy_split(seed)
+        d = split["X"].shape[1]
+        k = c3.slider("k", 2, d // 2, min(16, d // 4), key=f"by_k_{source}")
+        c1, c2, c3 = row(3)
+        n_pop = c1.slider("Population (fireflies)", 4, 30, 10, key="by_pop")
+        budget = c2.slider("Budget (evaluations)", 30, search_live.MAX_EVALS, 200, step=10,
+                           key="by_budget")
+        alpha = c3.slider("alpha (mutation scale)", 0.0, 0.5, 0.02, step=0.01, key="by_alpha")
+        params = (source, seed, k, n_pop, budget, alpha)
+        if st.button("Run search", type="primary", icon=":material/play_arrow:"):
+            st.session_state["by_res"] = (params,
+                                          run_search(split, k, n_pop, budget, alpha, seed))
     saved = st.session_state.get("by_res")
-    if saved and saved[0] == params:
-        res = saved[1]
-        if res["stopped"]:
-            st.warning(res["stopped"])
-        curve = pd.DataFrame(dict(evals=[f["evals"] for f in res["frames"]],
-                                  best=[f["best"] for f in res["frames"]]))
-        st.plotly_chart(charts.fitness_curves({"firefly": curve}, None,
-                                              "Live convergence: best validation fitness"),
-                        key="by_curve")
-        overfitting_meter(res)
-        if source == "toy":
-            hits = int(res["best_mask"][:search_live.TOY["n_informative"]].sum())
-            st.markdown(f"Selected columns: {np.flatnonzero(res['best_mask']).tolist()}. "
-                        f"{hits} of the {search_live.TOY['n_informative']} informative "
-                        "columns (the first ones) were picked; informative columns are not "
-                        "always separating.")
+    with card("convergence", "Live convergence", eyebrow="✨ Build your own"):
+        if saved and saved[0] == params:
+            res = saved[1]
+            if res["stopped"]:
+                st.warning(res["stopped"])
+            curve = pd.DataFrame(dict(evals=[f["evals"] for f in res["frames"]],
+                                      best=[f["best"] for f in res["frames"]]))
+            st.plotly_chart(charts.fitness_curves({"firefly": curve}, None,
+                                                  "best validation fitness"), key="by_curve")
+            if source == "toy":
+                hits = int(res["best_mask"][:search_live.TOY["n_informative"]].sum())
+                st.markdown(f"Selected columns: {np.flatnonzero(res['best_mask']).tolist()}. "
+                            f"{hits} of the {search_live.TOY['n_informative']} informative "
+                            "columns (the first ones) were picked; informative columns are "
+                            "not always separating.")
+            else:
+                frames_view(res, "by_frames")
+            st.caption(f"Compared with {display('anova')} at the same k, chosen on the same "
+                       "inner-train rows. Same seed and settings give the same result.")
+        elif saved:
+            st.info("Settings changed; run the search again.")
         else:
-            frames_view(res, "by_frames")
-        st.caption(f"Compared with {display('anova')} at the same k, chosen on the same "
-                   "inner-train rows. Same seed and settings give the same result.")
-    elif saved:
-        st.info("Settings changed; run the search again.")
+            st.info("Press Run search to start.", icon=":material/play_arrow:")
+
+if res is not None:
+    overfitting_meter(res, mode)

@@ -34,3 +34,13 @@ PAGE_SPECS: tuple[PageSpec, ...] = (
              "Playground", "digits-live", "B8"),
     PageSpec("10_limits.py", "Limits", ":material/info:", "About", "limits", "B2"),
 )
+
+# One emoji per top-bar section as a visual anchor (none on pages or in copy).
+SECTION_EMOJI: dict[str, str] = {
+    "Overview": "⚡", "Results": "📊", "Demos": "✨", "Playground": "🧪", "About": "📎",
+}
+
+
+def section_label(section: str) -> str:
+    emoji = SECTION_EMOJI.get(section)
+    return f"{emoji} {section}" if emoji else section

@@ -2,13 +2,13 @@
 
 import streamlit as st
 
+from app.components.bento import card, golden, hero
 from app.lib import data, facts
 
-st.title("Limits")
-st.markdown(
-    "What this benchmark does not show: statistical power is limited by the number of "
-    "seeds, there is a single backbone and CIFAR-10 subset, and search times were "
-    "measured under load.")
+hero("Limits",
+     "What this benchmark does not show: power is limited by the number of seeds, there is "
+     "a single backbone and CIFAR-10 subset, and search times were measured under load.",
+     eyebrow="📎 About")
 
 notes = []
 try:
@@ -28,16 +28,25 @@ notes.append("Firefly does not run on a new image: the subset is chosen once on 
              "data, then a fixed classifier uses those features.")
 notes.append("PCA is a projection, not a selector: it needs the full embedding and a "
              "projection matrix at inference.")
-with st.container(border=True):
-    st.subheader("Computed notes")
-    for note in notes:
-        st.markdown(f"- {note}")
 
 prereg = data.read_text(data.ROOT / "PREREG.md")
-for heading in ("Limitations accepted in advance", "Disclosed asymmetries",
-                "What we will do if Firefly does not win"):
-    body = data.md_section(prereg, heading)
-    if body:
-        st.subheader(heading)
-        st.markdown(body)
-st.caption("Sections above are rendered from PREREG.md, written before the main runs.")
+sections = {h: data.md_section(prereg, h) for h in (
+    "Limitations accepted in advance", "Disclosed asymmetries",
+    "What we will do if Firefly does not win")}
+
+left, right = golden("limits")
+with left, card("accepted", "Limitations accepted in advance", eyebrow="📌 From PREREG.md"):
+    body = sections["Limitations accepted in advance"]
+    st.markdown(body if body else "Not found in PREREG.md.")
+with right:
+    with card("computed", "Computed notes", eyebrow="Computed from the results"):
+        for note in notes:
+            st.markdown(f"- {note}")
+    with card("asymmetries", "Disclosed asymmetries", eyebrow="📌 From PREREG.md"):
+        body = sections["Disclosed asymmetries"]
+        st.markdown(body if body else "Not found in PREREG.md.")
+
+with card("plan", "What we will do if Firefly does not win", eyebrow="📌 From PREREG.md"):
+    body = sections["What we will do if Firefly does not win"]
+    st.markdown(body if body else "Not found in PREREG.md.")
+    st.caption("PREREG.md sections were written before the main runs.")
