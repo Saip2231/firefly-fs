@@ -2,16 +2,17 @@
 
 import streamlit as st
 
-from app.components.bento import card, hero, row
+from app.components.bento import card, crisp, hero, nerd, row
 from app.components.callout import data_error, exploratory, takeaway
 from app.lib import charts, cost_view, data, facts
 from app.lib.methods import DATASET_DISPLAY, DATASET_SHORT, display, sort_key
 from app.lib.stats_view import format_break_even
 
 hero("Cost (RQ2)",
-     "Search time, inference time and break-even (exploratory). Search times were measured "
-     "under 15-way parallel load.",
-     eyebrow="📊 Results")
+     "What each method costs to search, and when a smaller subset pays that back.",
+     eyebrow="📊 Results",
+     more="Search time, inference time and break-even (exploratory). Search times were "
+          "measured under 15-way parallel load.")
 
 try:
     cost = data.load_analysis("rq2_cost")
@@ -48,18 +49,22 @@ with card("scatter", "Accuracy vs search time", eyebrow="⏱️ Exploratory"):
              f"and {display(best['method'])} has the highest mean accuracy "
              f"({best['acc_mean']:.3f}); metaheuristic searches take "
              f"{meta.min():.0f}-{meta.max():.0f} s under load.")
-    exploratory("cost and break-even are descriptive; no significance tests")
+    with nerd("scatter-note"):
+        exploratory("cost and break-even are descriptive; no significance tests")
 
 with card("calc", "Break-even calculator", eyebrow="⏱️ Exploratory"):
     if timing is None or factor is None:
         st.info("Idle timings (results/analysis/timing_idle.csv) or the contention factor "
                 "are missing, so the calculator is hidden.")
         st.stop()
-    st.markdown(
-        "How many single predictions must a smaller subset serve before its search time is "
-        f"repaid? Search time is the logged time divided by the A4 contention factor "
-        f"({factor:.2f}); per-prediction times are A4's idle single-sample medians on "
-        "training rows (seed 0).")
+    with crisp("calc-note"):
+        st.caption("How many predictions a smaller subset must serve to repay its search.")
+    with nerd("calc-note"):
+        st.markdown(
+            "How many single predictions must a smaller subset serve before its search time "
+            f"is repaid? Search time is the logged time divided by the A4 contention factor "
+            f"({factor:.2f}); per-prediction times are A4's idle single-sample medians on "
+            "training rows (seed 0).")
     c1, c2, c3 = row([1.2, 1, 1.2])
     methods = sorted(view["method"].unique(), key=sort_key)
     method = c1.selectbox("Method", methods, format_func=display, key=f"cost_m_{dataset}_{k}")

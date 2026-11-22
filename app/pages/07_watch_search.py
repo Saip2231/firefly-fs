@@ -2,16 +2,17 @@
 
 import streamlit as st
 
-from app.components.bento import card, golden, hero, kv, row
+from app.components.bento import card, golden, hero, kv, nerd, row
 from app.components.callout import takeaway
 from app.components.frame_player import frame_player
 from app.lib import charts, traces
 from app.lib.methods import DATASET_DISPLAY, DATASET_SHORT, display, sort_key
 
 hero("Watch a real search",
-     "Frame-by-frame replays of logged Firefly and PSO searches. Playback starts only when "
-     "you press Play.",
-     eyebrow="✨ Demos")
+     "Replay a logged Firefly or PSO search, frame by frame.",
+     eyebrow="✨ Demos",
+     more="Frame-by-frame replays of logged Firefly and PSO searches. Playback starts only "
+          "when you press Play.")
 
 index = traces.trace_index()
 if index.empty:
@@ -71,15 +72,17 @@ with left, card("summary", "What the replay shows", eyebrow="Summary"):
              f"{final['best'].iloc[0]:.4f} to {final['best'].iloc[-1]:.4f} over "
              f"{int(final['evals'].iloc[-1])} evaluations; the curves compare the methods "
              f"run with the same seed, k={k} and budget {budget}.")
-    st.caption("Frames are evenly spaced and always include the first and last. Validation "
-               "fitness is what the search optimises, so it is optimistic; test accuracy is "
-               "on the Results page.")
+    with nerd("summary-note"):
+        st.caption("Frames are evenly spaced and always include the first and last. "
+                   "Validation fitness is what the search optimises, so it is optimistic; "
+                   "test accuracy is on the Results page.")
 with right, card("check", "Replay check", eyebrow="🔒 Matches the logged run"):
     if traces.matches_logged(trace):
         st.success(f"✓ Final mask matches the logged run (results/meta_{dataset}.csv, "
                    f"seed {seed}, raw mask).", icon=":material/verified:")
     else:
         st.error("✗ Final mask does NOT match the logged run.", icon=":material/error:")
-    kv([("Frames shown", f"{n_frames} of {int(trace['frames_total'])}"),
-        ("Fitness, start", f"{final['best'].iloc[0]:.4f}"),
-        ("Fitness, end", f"{final['best'].iloc[-1]:.4f}")])
+    with nerd("check-detail"):
+        kv([("Frames shown", f"{n_frames} of {int(trace['frames_total'])}"),
+            ("Fitness, start", f"{final['best'].iloc[0]:.4f}"),
+            ("Fitness, end", f"{final['best'].iloc[-1]:.4f}")])

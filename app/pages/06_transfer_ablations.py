@@ -2,16 +2,17 @@
 
 import streamlit as st
 
-from app.components.bento import card, hero, row
+from app.components.bento import card, hero, nerd, row
 from app.components.callout import data_error, exploratory, takeaway
 from app.lib import charts, data
 from app.lib.methods import DATASET_DISPLAY, DATASET_SHORT, display
 from app.lib.stats_view import format_p
 
 hero("Transfer and ablations",
-     "How subsets chosen under logistic regression transfer to KNN and linear SVM, and the "
-     "effect of seeding, re-ranking and search budget (all exploratory).",
-     eyebrow="📊 Results")
+     "Do the subsets carry over to other classifiers, and what do the tweaks change?",
+     eyebrow="📊 Results",
+     more="How subsets chosen under logistic regression transfer to KNN and linear SVM, and "
+          "the effect of seeding, re-ranking and search budget (all exploratory).")
 
 try:
     transfer = data.load_analysis("rq4_transfer")
@@ -50,7 +51,8 @@ with card("panel", "Transfer and ablations", eyebrow="🧪 Exploratory"):
             v, f"{'KNN' if clf == 'knn' else 'Linear SVM'} accuracy, search subset minus "
                f"filter subset · {DATASET_DISPLAY[dataset]}, k={k}, budget {budget}"),
             key="ta_transfer")
-        exploratory(str(v["note"].iloc[0]) if len(v) else "transfer")
+        with nerd("transfer-note"):
+            exploratory(str(v["note"].iloc[0]) if len(v) else "transfer")
         if len(v):
             lo = v.loc[v["mean_diff_pts"].idxmin()]
             hi = v.loc[v["mean_diff_pts"].idxmax()]
@@ -69,7 +71,8 @@ with card("panel", "Transfer and ablations", eyebrow="🧪 Exploratory"):
         pairs = sorted({f"{v} minus {r}" for v, r in zip(a["variant"], a["reference"])})
         st.plotly_chart(charts.diff_bars(a, f"{VIEWS[view]}: {'; '.join(pairs)} · "
                                             f"{DATASET_DISPLAY[dataset]}"), key=f"ta_{view}")
-        exploratory("paired by seed; Wilcoxon p-values are not corrected across families")
+        with nerd("ablation-note"):
+            exploratory("paired by seed; Wilcoxon p-values are not corrected across families")
         pos = int((a["mean_diff_pts"] > 0).sum())
         small = a[a["p_raw"] < 0.05]
         takeaway(f"The variant has the higher mean in {pos} of {len(a)} rows; "
@@ -77,7 +80,8 @@ with card("panel", "Transfer and ablations", eyebrow="🧪 Exploratory"):
                  + (f" (smallest p {format_p(small['p_raw'].min())})" if len(small) else "")
                  + ". Exploratory: these p-values are not corrected.")
         if view == "rerank_vs_raw" and "rerank_s_mean" in a:
-            takeaway(f"Re-ranking adds "
+            with nerd("rerank-note"):
+                takeaway(f"Re-ranking adds "
                      f"{int(a['total_fits_variant'].iloc[0] - a['total_fits_reference'].iloc[0])} "
                      f"classifier fits and {a['rerank_s_mean'].min():.1f}-"
                      f"{a['rerank_s_mean'].max():.1f} s per run on this dataset.")
@@ -88,8 +92,9 @@ with card("panel", "Transfer and ablations", eyebrow="🧪 Exploratory"):
                      "masks_changed"]
         if view == "budget_3000_vs_800":
             cols += ["search_s_variant", "search_s_reference"]
-            st.caption("search_s measured under 15-way parallel load.")
         table = a[[c for c in cols if c in a.columns]]
 
-with card("table", "Rows behind the chart", eyebrow="Table"):
+with nerd("table"), card("table", "Rows behind the chart", eyebrow="Table"):
     st.dataframe(table, hide_index=True)
+    if view == "budget_3000_vs_800":
+        st.caption("search_s measured under 15-way parallel load.")

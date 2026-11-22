@@ -6,7 +6,7 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
-from app.components.bento import card, golden, hero
+from app.components.bento import card, golden, hero, nerd
 from app.components.callout import data_error, takeaway
 from app.lib import charts, data, facts
 from app.lib.embedding import Embedder, to_cifar, upscaled_view
@@ -16,9 +16,10 @@ from app.lib.models import load_models, model_key, standardise
 from app.lib.safety import ALLOWED_EXTENSIONS, MAX_BYTES, UploadError, load_upload
 
 hero("Try an image",
-     "Run the demo models on an image from the official CIFAR-10 test set or your own. "
-     "Feature selection happened once on training data; it does not run on a new image.",
-     eyebrow="🧪 Playground")
+     "Classify an image with each method's subset, chosen once on training data.",
+     eyebrow="🧪 Playground",
+     more="Run the demo models on an image from the official CIFAR-10 test set or your own. "
+          "Feature selection happened once on training data; it does not run on a new image.")
 
 A = data.ASSETS
 NEEDED = [A / "resnet18_embed.onnx", A / "embedding_recipe.json", A / "demo_models.npz",
@@ -69,7 +70,8 @@ with notes_col, card("source", "Image source", eyebrow="Controls"):
         up = st.file_uploader(f"Upload an image ({', '.join(ALLOWED_EXTENSIONS)}, at most "
                               f"{MAX_BYTES / 1e6:.0f} MB; not stored)",
                               type=list(ALLOWED_EXTENSIONS), key="ti_upload")
-with notes_col, card("embedding", "About the embedding", eyebrow="📎 Reconstructed"):
+with notes_col, nerd("embedding"), card("embedding", "About the embedding",
+                                        eyebrow="📎 Reconstructed"):
     st.markdown(
         "The ResNet-18 embedding step was reconstructed (the original Day-1 script is "
         "lost): Resize(256), CenterCrop(224), ImageNet normalisation, average-pooled "
@@ -114,9 +116,10 @@ with image_col, card("preprocess", "Preprocessing", eyebrow="Step 1"):
         else:
             shown.thumbnail((480, 480))                        # display copy only
         col.image(shown, caption=caption, width=140)
-    st.caption(f"ONNX embedding time: {secs * 1000:.0f} ms"
-               + (f"; the ONNX embedding agrees with the stored gallery embedding to "
-                  f"{check:.1e}." if check is not None else "."))
+    with nerd("onnx-note"):
+        st.caption(f"ONNX embedding time: {secs * 1000:.0f} ms"
+                   + (f"; the ONNX embedding agrees with the stored gallery embedding to "
+                      f"{check:.1e}." if check is not None else "."))
 
 ks = sorted({m.k for key, m in models.items() if m.method != "all"})
 d = int(models[next(key for key in models if key.startswith("all__"))].k)
@@ -149,5 +152,6 @@ with card("strip", "Which embedding dimensions each method uses", eyebrow="Step 
         f"{display(method)}" + (" (PCA uses all of them through a projection)"
                                 if method == "pca" else "")),
         key="ti_strip")
-    st.caption("Firefly does not run on this image: its subset was chosen once, on training "
+    with nerd("strip-note"):
+        st.caption("Firefly does not run on this image: its subset was chosen once, on training "
                "data (seed 0), and the logistic regression here uses only those dimensions.")

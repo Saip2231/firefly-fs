@@ -196,7 +196,7 @@ button:active {{ transform: scale(0.98); }}
   position: absolute; width: 0; height: 0; margin: 0; overflow: visible;
 }}
 .ff-theme-pill {{
-  position: fixed; top: 0.7rem; right: 3.6rem; z-index: 999991;
+  position: relative;
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.22rem 0.7rem 0.22rem 0.5rem; border-radius: 999px; cursor: pointer;
   font: 500 13px/1.4 {FONT_STACK}; color: var(--ff-text);
@@ -308,10 +308,15 @@ def _sync_js() -> str:
 
 
 def page_head() -> str:
-    """Stylesheet, theme pill and theme-sync script for st.html in the entry app."""
+    """Stylesheet, top bar (nerd-mode switch + theme pill) and the sync
+    scripts, for st.html in the entry app."""
+    from app.lib import nerd  # noqa: PLC0415
+
     mode = current_mode()
-    return (f'<style>{css(mode)}</style>{_PILL}'
-            f'<script>document.documentElement.dataset.ffTheme ||= "{mode}";{_sync_js()}</script>')
+    return (f'<style>{css(mode)}{nerd.css(FONT_STACK)}</style>'
+            f'<div class="ff-topbar">{nerd.BUTTON}{_PILL}</div>'
+            f'<script>document.documentElement.dataset.ffTheme ||= "{mode}";{nerd.JS}'
+            f'{_sync_js()}</script>')
 
 
 def plotly_template(mode: str | None = None) -> Any:

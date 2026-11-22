@@ -83,6 +83,42 @@ def test_charts_set_explicit_text_colours():
     assert all(t.mode == "markers" for t in fig.data)        # no overlapping text labels
 
 
+@pytest.mark.parametrize("page", PAGES, ids=lambda p: p.name)
+def test_every_page_has_a_crisp_lede_and_nerd_detail(page):
+    """Nerd mode: each hero has a short lede plus `more=` detail for nerd mode."""
+    text = page.read_text(encoding="utf-8")
+    assert "more=" in text, "hero has no nerd-mode detail"
+
+
+def test_nerd_mode_toggle_in_top_bar():
+    from app.lib import nerd  # noqa: PLC0415
+    head = theme.page_head()
+    assert "ff-topbar" in head and "ff-nerd-pill" in head and "ff-theme-pill" in head
+    assert nerd.STORAGE_KEY in head and "aria-pressed" in head
+    assert "😎" in head and "🤓" in head                     # cool (off) -> nerd (on)
+    css = nerd.css(theme.FONT_STACK)
+    # crisp by default: nerd content hidden unless <html data-ff-nerd="on">
+    assert ':root:not([data-ff-nerd="on"]) [class*="st-key-ff-nerd-"]' in css
+    assert ':root[data-ff-nerd="on"] [class*="st-key-ff-crisp-"]' in css
+    assert "var(--ff-accent-2)" in css                       # secondary colour
+    for mode in theme.MODES:
+        t = theme.TOKENS[mode]
+        assert theme.contrast(t["accent_2"], t["background"]) >= 4.5, mode
+
+
+def test_rule_required_text_is_never_nerd_only():
+    """DASHBOARD.md rule 5: the one-image anecdote line stays in the crisp view."""
+    text = (ROOT / "app" / "pages" / "08_try_image.py").read_text(encoding="utf-8")
+    anecdote = text.index("One image is an anecdote")
+    before = text[:anecdote]
+    assert before.rfind('nerd("') < before.rfind('card("predictions"')
+
+
+def test_limits_has_no_stretched_split():
+    text = (ROOT / "app" / "pages" / "10_limits.py").read_text(encoding="utf-8")
+    assert "golden(" not in text
+
+
 def test_fonts_are_self_hosted():
     cfg = tomllib.loads((ROOT / ".streamlit" / "config.toml").read_text(encoding="utf-8"))
     assert cfg["server"]["enableStaticServing"] is True

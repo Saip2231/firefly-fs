@@ -7,7 +7,7 @@ import { useMemo, useRef, useState } from "react";
 import { Connectors, type EdgeState, type Packet } from "./Connectors";
 import { ControlBar } from "./ControlBar";
 import { COLORS, INK, int, pct, tint } from "./format";
-import { useCountUp, usePostFrameHeight, useThemeMode, useWidth } from "./hooks";
+import { useCountUp, useNerdMode, usePostFrameHeight, useThemeMode, useWidth } from "./hooks";
 import { LOCKED_EDGES, TALL, TRACK_EDGES, WIDE, type EdgeId, type NodeId } from "./layout";
 import { Chips, NodeCard, type NodeState } from "./NodeCard";
 import { ResultsCard } from "./ResultsCard";
@@ -47,6 +47,7 @@ const section: Variants = {
 
 export default function PipelineVisualizer({ payload }: { payload: PipelinePayload | null }) {
   useThemeMode(payload?.theme ?? null);
+  const nerdMode = useNerdMode();
   // ----- inputs ------------------------------------------------------------
   const systemReduce = useReducedMotion() ?? false;
   const [manualReduce, setManualReduce] = useState(false);
@@ -147,9 +148,11 @@ export default function PipelineVisualizer({ payload }: { payload: PipelinePaylo
                          tracking-[-0.015em]">
             The protocol, stage by stage
           </h2>
-          <p className="max-w-[65ch] text-[15.5px] leading-[1.65] text-muted">
-            Pick a dataset, a method and k, then play the protocol stage by stage.
-          </p>
+          {nerdMode && (
+            <p className="mt-1.5 max-w-[65ch] text-[15.5px] leading-[1.65] text-muted">
+              Pick a dataset, a method and k, then play the protocol stage by stage.
+            </p>
+          )}
         </motion.header>
 
         {!payload && (
@@ -282,7 +285,7 @@ export default function PipelineVisualizer({ payload }: { payload: PipelinePaylo
           </div>
         </motion.div>
 
-        <motion.p variants={section}
+        {nerdMode && <motion.p variants={section}
                   className="max-w-[65ch] text-[13px] leading-[1.65] text-muted">
           The animation shows the order of the protocol; it is not a live run. The result card
           shows the benchmark mean ± std over seeds for the selected dataset, method, k
@@ -290,7 +293,7 @@ export default function PipelineVisualizer({ payload }: { payload: PipelinePaylo
           {payload ? ` Selection time: ${payload.search_s_note}.` : ""}
           {payload && track === "meta" ? ` ${payload.inner_val_note}` : ""}
           {payload?.sources.length ? ` Sources: ${payload.sources.join(", ")}.` : ""}
-        </motion.p>
+        </motion.p>}
       </div>
     </motion.div>
   );

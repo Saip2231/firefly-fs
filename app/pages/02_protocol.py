@@ -5,7 +5,7 @@ from string import Template
 
 import streamlit as st
 
-from app.components.bento import card, fold, hero, kv
+from app.components.bento import card, fold, hero, kv, nerd
 from app.lib import data, pipeline_view, theme
 
 # Static fallback when the animated bundle is not built; colours from the
@@ -33,9 +33,10 @@ digraph protocol {
 """)
 
 hero("Protocol",
-     "How the benchmark was run: fixed splits per seed, feature selection on training data "
-     "only with an inner validation split, and the test split used once at the end.",
-     eyebrow="⚡ Overview")
+     "How the benchmark was run, from split to a single test score.",
+     eyebrow="⚡ Overview",
+     more="Fixed splits per seed, feature selection on training data only with an inner "
+          "validation split, and the test split used once at the end.")
 
 # The animated visualizer is its own bento card (border, surface, padding).
 try:
@@ -59,14 +60,17 @@ register = data.read_text(data.ROOT / "app" / "content" / "deviations.md")
 
 # The short summary stays open; the long documents fold away behind a chevron.
 with card("discipline", "The test split is used once", eyebrow="🔒 Locked test split"):
-    st.markdown("Selection never sees the test split. The search scores candidate subsets "
-                "on an inner validation split carved from training rows.")
+    with nerd("discipline"):
+        st.markdown("Selection never sees the test split. The search scores candidate "
+                    "subsets on an inner validation split carved from training rows.")
     kv([("Scaler fitted on", "training rows"), ("Search fitness", "inner validation"),
         ("Test split touched", "once, final model")])
 
-with fold("design", "Pre-registered design", eyebrow="📌 From PREREG.md"):
-    st.markdown(design or "PREREG.md not found; the pre-registered design cannot be shown.")
-with fold("primary", "Primary comparison (RQ1)", eyebrow="✓ Confirmatory"):
-    st.markdown(primary or "PREREG.md not found.")
-with fold("deviations", "Deviations register", eyebrow="📎 Disclosed changes"):
-    st.markdown(register or "app/content/deviations.md not found.")
+with nerd("prereg"):
+    with fold("design", "Pre-registered design", eyebrow="📌 From PREREG.md"):
+        st.markdown(design or "PREREG.md not found; the pre-registered design cannot be "
+                              "shown.")
+    with fold("primary", "Primary comparison (RQ1)", eyebrow="✓ Confirmatory"):
+        st.markdown(primary or "PREREG.md not found.")
+    with fold("deviations", "Deviations register", eyebrow="📎 Disclosed changes"):
+        st.markdown(register or "app/content/deviations.md not found.")

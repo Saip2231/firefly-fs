@@ -5,15 +5,16 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from app.components.bento import card, hero, row
+from app.components.bento import card, hero, nerd, row
 from app.components.callout import data_error, exploratory, takeaway
 from app.lib import charts, data, results_view
 from app.lib.methods import DATASET_DISPLAY, DATASET_SHORT, display, sort_key
 
 hero("Stability (RQ3)",
-     "How similar the selected feature subsets are across seeds, with random selection as "
-     "the reference (exploratory).",
-     eyebrow="📊 Results")
+     "Do methods pick the same features from seed to seed?",
+     eyebrow="📊 Results",
+     more="How similar the selected feature subsets are across seeds, with random selection "
+          "as the reference (exploratory).")
 
 try:
     stab = data.load_analysis("rq3_stability")
@@ -54,7 +55,9 @@ with card("jaccard", "Mean pairwise Jaccard across seeds", eyebrow="🧪 Explora
              + (f"plain Firefly reaches {ff['jaccard_mean'].iloc[0]:.2f}, "
                 f"{ff['jaccard_mean'].iloc[0] / refs['random (expected)']:.1f}x the random "
                 "expectation." if len(ff) else "plain Firefly is not in this view."))
-    exploratory(str(view["caveat"].iloc[0]) if "caveat" in view and len(view) else "stability")
+    with nerd("jaccard-note"):
+        exploratory(str(view["caveat"].iloc[0]) if "caveat" in view and len(view)
+                    else "stability")
 
 seeds = data.per_seed(dataset)
 sel = seeds[(seeds["k"] == k) & seeds["method"].isin(view["method"])]
@@ -79,13 +82,15 @@ with card("freq", "How often each feature was chosen", eyebrow=f"k = {k} of d = 
              f"{n_seeds} seeds and {int((counts > 0).sum())} features at least once, for "
              f"k={k} of d={d}.")
 
-with card("pixels", "Selection frequency per pixel", eyebrow="Digits only"):
-    if dataset == "digits":
+if dataset == "digits":
+    with card("pixels", "Selection frequency per pixel", eyebrow="Digits only"):
         pic, note = row([1, 1.618])
         pic.plotly_chart(charts.pixel_grid(counts, f"{display(method)}, k={k}",
                                            zmax=n_seeds), key="stab_pixels")
-        note.caption("Valid only for Digits, where features are pixels of the 8x8 image. "
-                     "Each cell counts the seeds that chose that pixel.")
-    else:
+        with note, nerd("pixels-note"):
+            st.caption("Valid only for Digits, where features are pixels of the 8x8 image. "
+                       "Each cell counts the seeds that chose that pixel.")
+else:
+    with nerd("pixels"), card("pixels", "Selection frequency per pixel", eyebrow="Digits only"):
         st.caption("No pixel map for CIFAR: its features are embedding dimensions, "
                    "not pixels.")

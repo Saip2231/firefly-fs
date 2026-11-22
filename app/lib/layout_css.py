@@ -77,11 +77,23 @@ table, code, [data-testid="stDataFrame"], [data-testid="stMetricValue"],
 {MAIN} > div > [data-testid="stVerticalBlock"] {{ gap: {s["md"]}px; }}
 
 /* Hero: the only text allowed straight on the page background. */
-{HERO} {{ gap: {s["xs"]}px; padding-bottom: {s["sm"]}px; }}
-{HERO} h1 {{ padding: 0 !important; margin: 0 !important; }}
+{HERO} {{ gap: {s["sm"]}px; padding-bottom: {s["sm"]}px; }}
+{HERO} h1 {{ padding: 0 !important; margin: 0 0 6px !important; }}
 .ff-lede {{
   max-width: 65ch; margin: 0; color: var(--ff-muted);
   font-size: 1.075rem; line-height: 1.65;
+}}
+.ff-lede-more {{ margin-top: {s["xs"]}px; font-size: 1rem; }}
+
+/* Headings inside markdown (PREREG excerpts, notes): room before the first line. */
+[data-testid="stMarkdownContainer"] :is(h2, h3, h4):not(.ff-card-title) {{
+  padding-bottom: 0 !important; margin-bottom: 0.55em !important;
+}}
+[data-testid="stMarkdownContainer"] :is(h2, h3, h4):not(.ff-card-title):not(:first-child) {{
+  margin-top: 1.1em !important;
+}}
+{CARD} [data-testid="stMarkdownContainer"] > :is(h2, h3, h4):first-child {{
+  padding-top: 0 !important;
 }}
 
 /* Bento card: surface, 1px border, 26 px padding, 16 px inner rhythm. */
@@ -93,14 +105,18 @@ table, code, [data-testid="stDataFrame"], [data-testid="stMetricValue"],
   box-shadow: var(--ff-shadow);
   gap: {s["sm"]}px;
 }}
-{CARD} h3 {{ padding: 0 !important; margin: 0 !important; }}
 {CARD} [data-testid="stMarkdownContainer"] p,
 {CARD} [data-testid="stMarkdownContainer"] li,
 {CARD} [data-testid="stCaptionContainer"] p {{ max-width: 65ch; }}
 {CARD} [data-testid="stMetric"], {CARD} [data-testid="stExpander"] details {{
   background: var(--ff-background); box-shadow: none;
 }}
-.ff-card-head {{ display: flex; flex-direction: column; gap: 6px; }}
+/* Card head: eyebrow, title, then 26 px (16 gap + 10 margin) to the first line. */
+.ff-card-head {{
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: {s["xs"]}px;
+}}
+.ff-card-head h3.ff-card-title {{ padding: 0 !important; margin: 0 !important; }}
+.st-key-ff-nerd-prereg {{ gap: {s["md"]}px; }}
 .ff-eyebrow {{
   display: inline-flex; align-items: center; gap: 8px; margin: 0;
   font: 500 0.75rem/1.2 var(--font-mono); letter-spacing: 0.12em;
@@ -140,7 +156,8 @@ table, code, [data-testid="stDataFrame"], [data-testid="stMetricValue"],
 [class*="st-key-ff-fold-"] [data-testid="stExpanderDetails"] {{
   padding: 0 {s["md"]}px {s["md"]}px !important;
 }}
-[class*="st-key-ff-fold-"] .ff-fold-meta {{ margin: 0 0 6px 4px; }}
+[class*="st-key-ff-fold-"] .ff-fold-meta {{ margin: 0 0 8px 4px; }}
+[class*="st-key-ff-fold-"] [data-testid="stExpanderDetails"] > div {{ padding-top: 6px; }}
 
 /* Charts: full card width; controls sit in one horizontal row above them. */
 {CARD} [data-testid="stPlotlyChart"] {{ width: 100%; }}

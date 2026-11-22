@@ -3,7 +3,7 @@ WIN/LOSS/TIE grid, and a per-family panel with paired per-seed differences."""
 
 import streamlit as st
 
-from app.components.bento import card, hero, row
+from app.components.bento import card, crisp, hero, nerd, row
 from app.components.callout import data_error, takeaway
 from app.components.label_grid import label_grid
 from app.lib import charts, data, facts, results_view
@@ -11,9 +11,10 @@ from app.lib.methods import DATASET_DISPLAY, DATASET_SHORT, display, sort_key
 from app.lib.stats_view import format_p, label_text
 
 hero("Results explorer (RQ1)",
-     "The pre-registered comparisons of plain Firefly against each comparator, for each "
-     "dataset, k and search budget (paired Wilcoxon, Holm within each family).",
-     eyebrow="📊 Results")
+     "Plain Firefly against each comparator, for every dataset, k and budget.",
+     eyebrow="📊 Results",
+     more="The pre-registered comparisons of plain Firefly against each comparator, for "
+          "each dataset, k and search budget (paired Wilcoxon, Holm within each family).")
 
 try:
     desc = data.load_analysis("descriptive")
@@ -41,8 +42,9 @@ with card("acc", "Accuracy vs k", eyebrow="📊 Mean ± std over seeds"):
     st.plotly_chart(charts.acc_vs_k(view, f"{DATASET_DISPLAY[dataset]}, budget {budget}"),
                     key="res_acc_vs_k")
     takeaway(results_view.explorer_takeaway(view))
-    st.caption("Baselines have no search budget; the same baseline rows appear at both "
-               "budgets. PCA is a projection, not a selector (dashed).")
+    with nerd("acc-note"):
+        st.caption("Baselines have no search budget; the same baseline rows appear at both "
+                   "budgets. PCA is a projection, not a selector (dashed).")
 
 # -- grid ----------------------------------------------------------------------
 grid = results_view.grid_table(rq1)
@@ -55,9 +57,12 @@ with card("grid", "Pre-registered tests: plain Firefly vs each comparator",
     m[1].metric(label_text("WIN"), counts["WIN"], border=True)
     m[2].metric(label_text("LOSS"), counts["LOSS"], border=True)
     m[3].metric(label_text("TIE"), counts["TIE"], border=True)
-    st.caption(f"Each cell shows the label symbol and the mean difference in accuracy points "
-               f"(Firefly minus comparator). n={n} seeds per test; the smallest possible p is "
-               f"{facts.min_two_sided_p(n):.4f}, so power is limited.")
+    with crisp("grid-note"):
+        st.caption(f"n={n} seeds per test; power is limited. Click a cell for details.")
+    with nerd("grid-note"):
+        st.caption(f"Each cell shows the label symbol and the mean difference in accuracy "
+                   f"points (Firefly minus comparator). n={n} seeds per test; the smallest "
+                   f"possible p is {facts.min_two_sided_p(n):.4f}, so power is limited.")
     sel = label_grid(grid)
 
 # -- family panel: stat tiles in a row, chart at full width -------------------
@@ -79,7 +84,8 @@ with card("family", f"{sel['family']}: Firefly vs {display(sel['comparator'])}",
                 help=f"raw p {format_p(sel['p_raw'])}", border=True)
     m[3].metric("Non-zero pairs", f"{int(sel['nonzero_pairs'])} of {int(sel['n'])}",
                 border=True)
-    st.markdown(results_view.panel_sentence(sel, diffs))
+    with nerd("family-note"):
+        st.markdown(results_view.panel_sentence(sel, diffs))
     st.plotly_chart(charts.seed_diffs(diffs, sel["comparator"]), key="res_seed_diffs")
     table = diffs.rename(columns={"acc_lr_firefly": "firefly accuracy",
                                   "acc_lr_comparator": f"{sel['comparator']} accuracy",
@@ -89,6 +95,6 @@ with card("family", f"{sel['family']}: Firefly vs {display(sel['comparator'])}",
                                  f"_{sel['comparator']}.csv",
                        mime="text/csv", icon=":material/download:")
 
-with card("table", f"All {len(grid)} tests", eyebrow="Table"):
+with nerd("table"), card("table", f"All {len(grid)} tests", eyebrow="Table"):
     with st.expander("Show the full table"):
         st.dataframe(grid.drop(columns=["family"]), hide_index=True)

@@ -88,6 +88,38 @@ export function useThemeMode(fallback: ThemeMode | null): ThemeMode {
   return mode;
 }
 
+/**
+ * Nerd mode of the host page (app/lib/nerd.py sets <html data-ff-nerd="on|off">
+ * on the Streamlit page).  Off by default: the diagram then hides its longer
+ * notes.  Outside Streamlit (dev) it is on, so nothing is hidden.
+ */
+export function useNerdMode(): boolean {
+  const read = (): boolean => {
+    try {
+      const v = window.parent?.document?.documentElement?.dataset?.ffNerd;
+      if (window.parent === window) return true;
+      return v === "on";
+    } catch {
+      return true;
+    }
+  };
+  const [on, setOn] = useState<boolean>(read);
+  useEffect(() => {
+    let observer: MutationObserver | null = null;
+    try {
+      const root = window.parent?.document?.documentElement;
+      if (root && root !== document.documentElement) {
+        observer = new MutationObserver(() => setOn(read()));
+        observer.observe(root, { attributes: true, attributeFilter: ["data-ff-nerd"] });
+      }
+    } catch {
+      observer = null;
+    }
+    return () => observer?.disconnect();
+  }, []);
+  return on;
+}
+
 /** Ask the Streamlit host iframe to fit our height (ignored outside Streamlit). */
 export function usePostFrameHeight(deps: unknown[]): void {
   useEffect(() => {

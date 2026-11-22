@@ -5,16 +5,17 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from app.components.bento import card, hero, row
+from app.components.bento import card, crisp, hero, nerd, row
 from app.components.callout import takeaway
 from app.components.frame_player import frame_player
 from app.lib import charts, search_live
 from app.lib.methods import display
 
 hero("Digits live and build your own",
-     "Run a small, capped search live on the Digits training split and score it on a "
-     "holdout carved from that training split.",
-     eyebrow="🧪 Playground")
+     "Run a small Firefly search live and see how well its pixels generalise.",
+     eyebrow="🧪 Playground",
+     more="Run a small, capped search live on the Digits training split and score it on a "
+          "holdout carved from that training split.")
 
 MODES = ["Digits live", "Build your own"]
 
@@ -71,9 +72,13 @@ def frames_view(res: dict, key: str) -> None:
 with card("mode", "Mode", eyebrow="Controls"):
     c1, c2 = row([1, 1.618])
     mode = c1.segmented_control("Mode", MODES, default=MODES[0], key="dl_mode") or MODES[0]
-    c2.caption(f"Caps: at most {search_live.MAX_EVALS} evaluations and "
-               f"{search_live.MAX_SECONDS:.0f} s per run, one thread. Clicking any control "
-               "while a run is in progress (Stop included) stops it.")
+    with c2, crisp("caps"):
+        st.caption(f"Capped at {search_live.MAX_EVALS} evaluations and "
+                   f"{search_live.MAX_SECONDS:.0f} s per run.")
+    with c2, nerd("caps"):
+        st.caption(f"Caps: at most {search_live.MAX_EVALS} evaluations and "
+                   f"{search_live.MAX_SECONDS:.0f} s per run, one thread. Clicking any "
+                   "control while a run is in progress (Stop included) stops it.")
 
 res = None
 if mode == "Digits live":
@@ -152,8 +157,10 @@ else:
                             "not always separating.")
             else:
                 frames_view(res, "by_frames")
-            st.caption(f"Compared with {display('anova')} at the same k, chosen on the same "
-                       "inner-train rows. Same seed and settings give the same result.")
+            with nerd("convergence-note"):
+                st.caption(f"Compared with {display('anova')} at the same k, chosen on the "
+                           "same inner-train rows. Same seed and settings give the same "
+                           "result.")
         elif saved:
             st.info("Settings changed; run the search again.")
         else:

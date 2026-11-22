@@ -30,13 +30,24 @@ def _eyebrow(text: str) -> str:
     return f'<p class="{cls}">{escape(text)}</p>'
 
 
-def hero(title: str, lede: str, eyebrow: str) -> None:
-    """Eyebrow, page title (st.title, so it stays the page's h1) and a lede of
-    two or three lines at most."""
+def hero(title: str, lede: str, eyebrow: str, more: str | None = None) -> None:
+    """Eyebrow, page title (st.title, so it stays the page's h1) and a one-line
+    lede; `more` is the longer explanation, shown only in nerd mode."""
     with st.container(key="ff-hero"):
         st.markdown(_eyebrow(eyebrow), unsafe_allow_html=True)
         st.title(title, anchor=False)
-        st.markdown(f'<p class="ff-lede">{escape(lede)}</p>', unsafe_allow_html=True)
+        extra = f'<p class="ff-lede ff-lede-more ff-nerd">{escape(more)}</p>' if more else ""
+        st.markdown(f'<p class="ff-lede">{escape(lede)}</p>{extra}', unsafe_allow_html=True)
+
+
+def nerd(key: str):
+    """Container whose content shows only in nerd mode (app/lib/nerd.py)."""
+    return st.container(key=f"ff-nerd-{key}")
+
+
+def crisp(key: str):
+    """Container whose content shows only in the crisp (default) view."""
+    return st.container(key=f"ff-crisp-{key}")
 
 
 @contextmanager
